@@ -9,8 +9,14 @@ const rubik = Rubik({
   variable: '--font-rubik',
 });
 
+// Define the joke interface
+interface Joke {
+  punchline: string;
+  setup: string;
+}
+
 // Sample data - fallback if API fails
-const sampleData = [
+const sampleData: Joke[] = [
   {"punchline":"I have a bream.","setup":"What did MLK say to the fishmonger?"},
   {"punchline":"They have sects.","setup":"How do religions reproduce?"},
   {"punchline":"Because they're paid to.","setup":"Why do people at work always laugh at my jokes?"},
@@ -22,11 +28,11 @@ const sampleData = [
 ]
 
 export default function JokeFlashcards() {
-  const [jokes, setJokes] = useState([])
+  const [jokes, setJokes] = useState<Joke[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   // Load jokes on component mount
   useEffect(() => {
@@ -35,7 +41,7 @@ export default function JokeFlashcards() {
         setLoading(true)
         const response = await fetch('https://thecodeworks.in/core/punchline')
         if (!response.ok) throw new Error('Failed to fetch jokes')
-        const data = await response.json()
+        const data: Joke[] = await response.json()
         setJokes(data)
       } catch (err) {
         console.error('Failed to load jokes:', err)
