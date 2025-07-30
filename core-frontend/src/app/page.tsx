@@ -1,103 +1,165 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Rubik } from 'next/font/google';
+import Link from 'next/link';
+import Image from 'next/image';
+
+const rubik = Rubik({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-rubik',
+});
+
+// Add Yusei Magic font
+const yuseiMagic = {
+  fontFamily: 'Yusei Magic',
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [greeting, setGreeting] = useState('Good Morning');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    const updateGreeting = () => {
+      const hour = new Date().getHours();
+      if (hour < 12) {
+        setGreeting('Good Morning');
+      } else if (hour < 18) {
+        setGreeting('Good Afternoon');
+      } else {
+        setGreeting('Good Evening');
+      }
+    };
+
+    updateGreeting();
+    // Update greeting every minute
+    const interval = setInterval(updateGreeting, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const gameOptions = [
+    {
+      id: 'miniesque',
+      title: 'Mini-esque',
+      subtitle: 'Almost a mini.',
+      icon: '/icons/miniesque.svg',
+      href: 'https://thecodeworks.in/coreTries/exolve-player.html'
+    },
+    {
+      id: 'connections',
+      title: 'Connections',
+      subtitle: 'Play the classic game.',
+      icon: '/icons/connections.svg',
+      href: '/connections'
+    },
+    {
+      id: 'archives',
+      title: 'Archives',
+      subtitle: 'Play Mini NYT archives',
+      icon: '/icons/archives.svg',
+      href: 'https://thecodeworks.in/coreTries/exolve-player2.html'
+    },
+    {
+      id: 'punchline',
+      title: 'Punchline',
+      subtitle: 'Not a game actually.',
+      icon: '/icons/punchline.svg',
+      href: '/punchline'
+    },
+    {
+      id: 'sudokuction',
+      title: 'Sudokuction',
+      subtitle: 'Jigsaw and Sudoku.',
+      icon: '/icons/sudokuction.svg',
+      href: 'https://thecodeworks.in/coreTries/s2.html'
+    },
+    {
+      id: 'trivia',
+      title: 'Trivia',
+      subtitle: 'Easy and Medium modes',
+      icon: '/icons/trivia.svg',
+      href: 'https://thecodeworks.in/coreTries/trivia.html'
+    },
+    {
+      id: 'tenet',
+      title: 'Tenet',
+      subtitle: 'Find all words through flips',
+      icon: '/icons/tenet.svg',
+      href: '/tenetw'
+    },
+    {
+      id: 'shuffle',
+      title: 'Shuffle',
+      subtitle: 'Lock all pairs in this memory',
+      icon: '/icons/shuffle.svg',
+      href: 'https://thecodeworks.in/coreTries/shuffle.html'
+    },
+    {
+      id: 'wordual',
+      title: 'Wordual',
+      subtitle: 'A two player twist on Wordle!',
+      icon: '/icons/wordual.svg',
+      href: '/wordual'
+    }
+  ];
+
+  return (
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap');
+      `}</style>
+      <div className={`min-h-screen bg-white ${rubik.variable} font-sans`}>
+        <div className="max-w-md mx-auto px-4 py-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-medium text-gray-900 mb-2">
+              {greeting}
+            </h1>
+            <p className="text-gray-600 text-sm">
+              Choose from our large selection of games & puzzles.
+            </p>
+          </div>
+
+          {/* Game Grid */}
+          <div className="space-y-3">
+            {gameOptions.map((game) => (
+              <Link
+                key={game.id}
+                href={game.href}
+                className="block w-full"
+              >
+                <div className="bg-white rounded-lg p-4 border border-gray-400 hover:shadow-sm transition-shadow duration-200 cursor-pointer">
+                  <div className="flex items-center space-x-4">
+                    {/* Icon */}
+                    <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
+                      <Image
+                        src={game.icon}
+                        alt={`${game.title} icon`}
+                        width={70}
+                        height={70}
+                        className="w-12 h-12 object-contain"
+                      />
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h3 
+                        className="text-lg font-normal text-gray-900 truncate mb-1"
+                        style={yuseiMagic}
+                      >
+                        {game.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 truncate">
+                        {game.subtitle}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </>
   );
 }

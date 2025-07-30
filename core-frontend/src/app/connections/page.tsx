@@ -1,4 +1,13 @@
 'use client';
+import { Rubik } from 'next/font/google';
+
+const rubik = Rubik({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-rubik',
+});
+
+
 
 import React, { useState, useEffect } from 'react';
 
@@ -203,7 +212,7 @@ export default function ConnectionsGame() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center ${rubik.variable} font-sans">
         <div className="text-xl">Loading game...</div>
       </div>
     );
@@ -211,7 +220,7 @@ export default function ConnectionsGame() {
 
   if (!gameData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center ${rubik.variable} font-sans">
         <div className="text-xl text-red-600">Failed to load game data</div>
       </div>
     );
@@ -223,103 +232,67 @@ export default function ConnectionsGame() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Connections</h1>
-          <p className="text-gray-600">Create four groups of four!</p>
-        </div>
+<div className="min-h-screen bg-white ${rubik.variable} font-sanss">
+      {/* Header */}
 
+
+      {/* Game Content */}
+      <div className="max-w-2xl mx-auto px-6 py-8">
         {/* Found Categories */}
-        <div className="space-y-2 mb-6">
-          {sortedFoundCategories.map((category, index) => (
-            <div
-              key={index}
-              className={`p-4 rounded-lg ${DIFFICULTY_COLORS[category.difficulty as keyof typeof DIFFICULTY_COLORS]} text-center`}
-            >
-              <div className="font-bold text-gray-800 text-lg mb-2">
-                {category.name.toUpperCase()}
+        {sortedFoundCategories.length > 0 && (
+          <div className="space-y-3 mb-8">
+            {sortedFoundCategories.map((category, index) => (
+              <div
+                key={index}
+                className={`p-5 rounded-lg ${DIFFICULTY_COLORS[category.difficulty]} shadow-sm border-2 border-transparent`}
+              >
+                <div className="text-center">
+                  <div className="font-bold text-black text-xl mb-2 tracking-wide">
+                    {category.name.toUpperCase()}
+                  </div>
+                  <div className="text-black text-lg font-medium">
+                    {category.words.join(', ')}
+                  </div>
+                </div>
               </div>
-              <div className="text-gray-700">
-                {category.words.join(', ')}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Game Board */}
         {remainingWords.length > 0 && (
-          <div className="grid grid-cols-4 gap-2 mb-6">
+          <div className="grid grid-cols-4 gap-3 mb-8">
             {remainingWords.map((word, index) => (
               <button
                 key={index}
                 onClick={() => handleWordClick(word)}
                 className={`
-                  p-4 rounded-lg font-semibold text-sm uppercase transition-all duration-200
+                  aspect-square flex items-center justify-center rounded-lg font-bold text-lg uppercase transition-all duration-150 border-2
                   ${selectedWords.includes(word)
-                    ? 'bg-gray-800 text-white transform scale-95'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    ? 'bg-pink-300 text-black border-gray-800 transform scale-95 shadow-inner'
+                    : 'bg-gray-100 text-black border-gray-300 hover:bg-gray-200 shadow-sm'
                   }
-                  ${gameStatus !== 'playing' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
+                  ${gameStatus !== 'playing' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:shadow-md'}
                 `}
                 disabled={gameStatus !== 'playing'}
               >
-                {word}
+                <span className="text-center leading-tight px-2">{word}</span>
               </button>
             ))}
           </div>
         )}
 
-        {/* Game Controls */}
-        {gameStatus === 'playing' && remainingWords.length > 0 && (
-          <div className="flex flex-col items-center space-y-4 mb-6">
-            <div className="flex space-x-4">
-              <button
-                onClick={shuffleWords}
-                className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Shuffle
-              </button>
-              <button
-                onClick={deselectOne}
-                className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                disabled={selectedWords.length === 0}
-              >
-                Deselect One
-              </button>
-              <button
-                onClick={clearSelection}
-                className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                disabled={selectedWords.length === 0}
-              >
-                Clear All
-              </button>
-            </div>
-            
-            <button
-              onClick={checkGuess}
-              className={`px-8 py-3 rounded-lg font-semibold transition-colors ${
-                selectedWords.length === 4
-                  ? 'bg-green-500 text-white hover:bg-green-600'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-              disabled={selectedWords.length !== 4}
-            >
-              Submit
-            </button>
-          </div>
-        )}
-
         {/* Mistakes Counter */}
-        <div className="text-center mb-6">
-          <div className="text-gray-600 mb-2">Mistakes remaining</div>
+        <div className="text-center mb-8">
+          <div className="text-gray-600 mb-3 text-lg font-medium">Mistakes remaining</div>
           <div className="flex justify-center space-x-2">
             {Array.from({ length: MAX_MISTAKES }, (_, i) => (
               <div
                 key={i}
-                className={`w-4 h-4 rounded-full ${
-                  i < mistakes ? 'bg-red-500' : 'bg-gray-300'
+                className={`w-5 h-5 rounded-full border-2 ${
+                  i < mistakes 
+                    ? 'bg-gray-800 border-gray-800' 
+                    : 'bg-white border-gray-300'
                 }`}
               />
             ))}
@@ -328,16 +301,56 @@ export default function ConnectionsGame() {
 
         {/* Message */}
         {message && (
-          <div className={`text-center py-3 rounded-lg mb-6 ${
+          <div className={`text-center py-4 rounded-lg mb-8 border-2 font-semibold text-lg ${
             message.includes('Correct') || message.includes('Congratulations')
-              ? 'bg-green-100 text-green-800'
+              ? 'bg-green-50 text-green-800 border-green-200'
               : showOneAway
-              ? 'bg-yellow-100 text-yellow-800'
+              ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
               : message.includes('Game over')
-              ? 'bg-red-100 text-red-800'
-              : 'bg-blue-100 text-blue-800'
+              ? 'bg-red-50 text-red-800 border-red-200'
+              : 'bg-blue-50 text-blue-800 border-blue-200'
           }`}>
             {message}
+          </div>
+        )}
+
+        {/* Game Controls */}
+        {gameStatus === 'playing' && remainingWords.length > 0 && (
+          <div className="flex flex-col items-center space-y-6">
+            <div className="flex flex-wrap justify-center gap-3">
+              <button
+                onClick={shuffleWords}
+                className="px-6 py-3 bg-white text-black rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-all font-semibold text-lg hover:shadow-md"
+              >
+                Shuffle
+              </button>
+              <button
+                onClick={deselectOne}
+                className="px-6 py-3 bg-white text-black rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-all font-semibold text-lg hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={selectedWords.length === 0}
+              >
+                Deselect one
+              </button>
+              <button
+                onClick={clearSelection}
+                className="px-6 py-3 bg-white text-black rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-all font-semibold text-lg hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={selectedWords.length === 0}
+              >
+                Clear all
+              </button>
+            </div>
+            
+            <button
+              onClick={checkGuess}
+              className={`px-12 py-4 rounded-full font-bold text-xl transition-all border-2 ${
+                selectedWords.length === 4
+                  ? 'bg-black text-white border-black hover:bg-gray-800 shadow-lg hover:shadow-xl transform hover:scale-105'
+                  : 'bg-gray-200 text-gray-500 border-gray-200 cursor-not-allowed'
+              }`}
+              disabled={selectedWords.length !== 4}
+            >
+              Submit
+            </button>
           </div>
         )}
 
@@ -346,7 +359,7 @@ export default function ConnectionsGame() {
           <div className="text-center">
             <button
               onClick={resetGame}
-              className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
+              className="px-12 py-4 bg-black text-white rounded-full hover:bg-gray-800 transition-all font-bold text-xl shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               Play Again
             </button>
