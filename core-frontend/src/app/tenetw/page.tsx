@@ -38,16 +38,17 @@ const wordList = [
   "bloke", "vivid", "spill", "chant", "choke", "rupee", "nasty", "mourn", "ahead", "brine"
 ];
 
+
 const fixedPositions = new Set(['0,0', '0,4', '4,0', '4,4', '2,2']);
 
 export default function TenetGame() {
-  const [originalWords, setOriginalWords] = useState([]);
-  const [currentBoard, setCurrentBoard] = useState([]);
+  const [originalWords, setOriginalWords] = useState<string[]>([]);
+  const [currentBoard, setCurrentBoard] = useState<string[][]>([]);
   const [moves, setMoves] = useState(0);
-  const [solvedWords, setSolvedWords] = useState(new Set());
-  const [selectedCell, setSelectedCell] = useState(null);
-  const [selectionMode, setSelectionMode] = useState('row'); // 'row' or 'col'
-  const [gameStatus, setGameStatus] = useState('playing'); // 'playing', 'perfect', 'all_words'
+  const [solvedWords, setSolvedWords] = useState(new Set<string>());
+  const [selectedCell, setSelectedCell] = useState<string | null>(null);
+  const [selectionMode, setSelectionMode] = useState<'row' | 'col'>('row');
+  const [gameStatus, setGameStatus] = useState<'playing' | 'perfect' | 'all_words'>('playing');
   const [showCelebration, setShowCelebration] = useState(false);
 
   // Initialize game
@@ -85,13 +86,13 @@ export default function TenetGame() {
     
     setCurrentBoard(board);
     setMoves(0);
-    setSolvedWords(new Set());
+    setSolvedWords(new Set<string>());
     setSelectedCell(null);
     setGameStatus('playing');
     setShowCelebration(false);
   };
 
-  const reverseRowOnBoard = (board, row) => {
+  const reverseRowOnBoard = (board: string[][], row: number): string[][] => {
     const newBoard = board.map(r => [...r]);
     const original = [...newBoard[row]];
     const reversed = [...original].reverse();
@@ -107,9 +108,9 @@ export default function TenetGame() {
     return newBoard;
   };
 
-  const reverseColOnBoard = (board, col) => {
+  const reverseColOnBoard = (board: string[][], col: number): string[][] => {
     const newBoard = board.map(r => [...r]);
-    const original = [];
+    const original: string[] = [];
     for (let row = 0; row < 5; row++) {
       original.push(newBoard[row][col]);
     }
@@ -160,7 +161,7 @@ export default function TenetGame() {
     }
   };
 
-  const handleCellClick = (row, col) => {
+  const handleCellClick = (row: number, col: number) => {
     const cellKey = `${row},${col}`;
     
     if (selectedCell === cellKey) {
@@ -188,11 +189,11 @@ export default function TenetGame() {
     setSelectedCell(null);
   };
 
-  const getHighlightedCells = () => {
+  const getHighlightedCells = (): Set<string> => {
     if (!selectedCell) return new Set();
     
     const [row, col] = selectedCell.split(',').map(Number);
-    const highlighted = new Set();
+    const highlighted = new Set<string>();
     
     if (selectionMode === 'row') {
       for (let c = 0; c < 5; c++) {
