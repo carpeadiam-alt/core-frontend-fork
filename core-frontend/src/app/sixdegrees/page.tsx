@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from 'react';
 
 const SixDegreesGame = () => {
-  const [gameData, setGameData] = useState(null);
-  const [currentOrder, setCurrentOrder] = useState([]);
+  const [gameData, setGameData] = useState<any>(null);
+  const [currentOrder, setCurrentOrder] = useState<string[]>([]);
   const [attemptsLeft, setAttemptsLeft] = useState(3);
-  const [gameState, setGameState] = useState('playing'); // 'playing', 'won', 'lost'
+  const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing');
   const [showAnswer, setShowAnswer] = useState(false);
-  const [expandedConnections, setExpandedConnections] = useState({});
-  const [draggedItem, setDraggedItem] = useState(null);
+  const [expandedConnections, setExpandedConnections] = useState<{[key: number]: boolean}>({});
+  const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Load random game from 6d.json
@@ -29,7 +29,7 @@ const SixDegreesGame = () => {
         setGameData(selectedGame);
         
         // Initialize shuffled order
-        const shuffleArray = (array) => {
+        const shuffleArray = (array: string[]): string[] => {
           const newArray = [...array];
           for (let i = newArray.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -89,7 +89,7 @@ const SixDegreesGame = () => {
       setGameData(selectedGame);
       
       // Initialize shuffled order
-      const shuffleArray = (array) => {
+      const shuffleArray = (array: string[]): string[] => {
         const newArray = [...array];
         for (let i = newArray.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -108,18 +108,18 @@ const SixDegreesGame = () => {
     }
   };
 
-  const handleDragStart = (e, index) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
     if (index === 0) return; // Can't drag the first item
     setDraggedItem(index);
     e.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = (e, dropIndex) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, dropIndex: number) => {
     e.preventDefault();
     if (draggedItem === null || draggedItem === 0 || dropIndex === 0) return;
 
@@ -137,22 +137,22 @@ const SixDegreesGame = () => {
     setDraggedItem(null);
   };
 
-  const toggleConnection = (index) => {
+  const toggleConnection = (index: number) => {
     setExpandedConnections(prev => ({
       ...prev,
       [index]: !prev[index]
     }));
   };
 
-  const truncateText = (text, maxLength = 80) => {
+  const truncateText = (text: string, maxLength: number = 80): string => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   };
 
-  const getConnectionText = (fromItem, toItem) => {
+  const getConnectionText = (fromItem: string, toItem: string): string => {
     if (!gameData) return '';
     const connection = gameData.connections.find(
-      conn => conn.from === fromItem && conn.to === toItem
+      (conn: any) => conn.from === fromItem && conn.to === toItem
     );
     return connection ? connection.connecting_text : '';
   };
@@ -271,7 +271,7 @@ const SixDegreesGame = () => {
           ) : (
             /* Answer Reveal State */
             <div className="space-y-8">
-              {gameData.original_path.map((item, index) => (
+              {gameData.original_path.map((item: string, index: number) => (
                 <div key={item}>
                   {/* Item */}
                   <div className="flex items-center justify-center">
