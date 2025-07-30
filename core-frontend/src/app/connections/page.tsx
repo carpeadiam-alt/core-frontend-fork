@@ -7,9 +7,9 @@ const rubik = Rubik({
   variable: '--font-rubik',
 });
 
-
-
 import React, { useState, useEffect } from 'react';
+
+type DifficultyLevel = 'Easiest' | 'Easy' | 'Medium' | 'Hard';
 
 interface GameData {
   all_words: string[];
@@ -23,17 +23,17 @@ interface GameData {
 interface FoundCategory {
   name: string;
   words: string[];
-  difficulty: string;
+  difficulty: DifficultyLevel;
 }
 
-const DIFFICULTY_COLORS = {
+const DIFFICULTY_COLORS: Record<DifficultyLevel, string> = {
   'Easiest': 'bg-yellow-300',
   'Easy': 'bg-green-300', 
   'Medium': 'bg-blue-300',
   'Hard': 'bg-purple-300'
 };
 
-const DIFFICULTY_ORDER = ['Easiest', 'Easy', 'Medium', 'Hard'];
+const DIFFICULTY_ORDER: DifficultyLevel[] = ['Easiest', 'Easy', 'Medium', 'Hard'];
 
 export default function ConnectionsGame() {
   const [gameData, setGameData] = useState<GameData | null>(null);
@@ -95,7 +95,7 @@ export default function ConnectionsGame() {
     if (selectedWords.length !== 4 || !gameData) return;
 
     // Find the correct category for these words
-    let correctCategory: { name: string; difficulty: string } | null = null;
+    let correctCategory: { name: string; difficulty: DifficultyLevel } | null = null;
     
     for (const difficulty of Object.keys(gameData.categories)) {
       for (const [categoryName, words] of Object.entries(gameData.categories[difficulty])) {
@@ -103,7 +103,7 @@ export default function ConnectionsGame() {
         const sortedSelectedWords = [...selectedWords].sort();
         
         if (JSON.stringify(sortedCategoryWords) === JSON.stringify(sortedSelectedWords)) {
-          correctCategory = { name: categoryName, difficulty };
+          correctCategory = { name: categoryName, difficulty: difficulty as DifficultyLevel };
           break;
         }
       }
@@ -188,7 +188,7 @@ export default function ConnectionsGame() {
           remainingCategories.push({
             name: categoryName,
             words,
-            difficulty
+            difficulty: difficulty as DifficultyLevel
           });
         }
       }
@@ -212,7 +212,7 @@ export default function ConnectionsGame() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center ${rubik.variable} font-sans">
+      <div className={`min-h-screen bg-gray-50 flex items-center justify-center ${rubik.variable} font-sans`}>
         <div className="text-xl">Loading game...</div>
       </div>
     );
@@ -220,7 +220,7 @@ export default function ConnectionsGame() {
 
   if (!gameData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center ${rubik.variable} font-sans">
+      <div className={`min-h-screen bg-gray-50 flex items-center justify-center ${rubik.variable} font-sans`}>
         <div className="text-xl text-red-600">Failed to load game data</div>
       </div>
     );
@@ -232,9 +232,8 @@ export default function ConnectionsGame() {
   });
 
   return (
-<div className="min-h-screen bg-white ${rubik.variable} font-sanss">
+    <div className={`min-h-screen bg-white ${rubik.variable} font-sans`}>
       {/* Header */}
-
 
       {/* Game Content */}
       <div className="max-w-2xl mx-auto px-6 py-8">
