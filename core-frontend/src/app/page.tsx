@@ -43,14 +43,14 @@ export default function Home() {
       title: 'Mini-esque',
       subtitle: 'Almost a mini.',
       icon: '/icons/miniesque.svg',
-      href: 'https://thecodeworks.in/coreTries/exolve-player.html'
+      href: '/minieque-fg'
     },
     {
       id: 'connections',
       title: 'Connections',
       subtitle: 'Play the classic game.',
       icon: '/icons/connections.svg',
-      href: '/connections'
+      href: '/connections-fg'
     },
     {
       id: 'archives',
