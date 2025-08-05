@@ -26,8 +26,8 @@ const buttonText = "Play"; // Button text
 
 export default function Page() {
   // Controllable parameters for SVG illustration
-  const svgWidth = 600; // Width of the SVG
-  const svgHeight = 400; // Height of the SVG
+  const svgWidth = 700; // Width of the SVG
+  const svgHeight = 600; // Height of the SVG
   const bottomOffset = -150; // Height from bottom in pixels
   const svgPath = "/fores/cbg.svg"; // Path to your SVG file
   
