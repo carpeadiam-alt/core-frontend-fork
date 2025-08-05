@@ -64,7 +64,7 @@ export default function Home() {
       title: 'Punchline',
       subtitle: 'Not a game actually.',
       icon: '/icons/punchline.svg',
-      href: '/punchline'
+      href: '/punchline-fg'
     },
     {
       id: 'sudokuction',
