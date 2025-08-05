@@ -71,7 +71,7 @@ export default function Home() {
       title: 'Sudokuction',
       subtitle: 'Jigsaw and Sudoku.',
       icon: '/icons/sudokuction.svg',
-      href: 'https://thecodeworks.in/coreTries/s2.html'
+      href: '/sudokuction-fg'
     },
     {
       id: 'trivia',
