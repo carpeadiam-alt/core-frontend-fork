@@ -26,10 +26,15 @@ const buttonText = "Play"; // Button text
 
 export default function Page() {
   // Controllable parameters for SVG illustration
-  const svgWidth = 700; // Width of the SVG
-  const svgHeight = 450; // Height of the SVG
+  const svgWidth = 700; // Base width of the SVG
+  const svgHeight = 450; // Base height of the SVG
+  const svgScaleFactor = 1.25; // Scale factor (1.0 = original size, 1.5 = 150%, 2.0 = 200%, etc.)
   const bottomOffset = -150; // Height from bottom in pixels
   const svgPath = "/fores/sdfg.svg"; // Path to your SVG file
+  
+  // Calculate scaled dimensions
+  const scaledWidth = svgWidth * svgScaleFactor;
+  const scaledHeight = svgHeight * svgScaleFactor;
   
   // Check if the link is external
   const isExternalLink = buttonHref.startsWith('http://') || buttonHref.startsWith('https://') || buttonHref.startsWith('//');
@@ -75,20 +80,20 @@ export default function Page() {
         )}
       </div>
 
-      {/* SVG Illustration - Fixed position with controllable size and bottom offset */}
+      {/* SVG Illustration - Fixed position with controllable size, scaling factor, and bottom offset */}
       <div 
         className="fixed left-1/2 transform -translate-x-1/2 pointer-events-none"
         style={{ 
           bottom: `${bottomOffset}px`,
-          width: `${svgWidth}px`,
-          height: `${svgHeight}px`
+          width: `${scaledWidth}px`,
+          height: `${scaledHeight}px`
         }}
       >
         <Image
           src={svgPath}
           alt="Game illustration"
-          width={svgWidth}
-          height={svgHeight}
+          width={scaledWidth}
+          height={scaledHeight}
           className="w-full h-full object-contain"
           priority
         />
