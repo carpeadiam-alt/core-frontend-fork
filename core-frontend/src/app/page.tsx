@@ -99,7 +99,7 @@ export default function Home() {
       title: 'Wordual',
       subtitle: 'A two player twist on Wordle!',
       icon: '/icons/wordual.svg',
-      href: '/wordual'
+      href: 'https://wordual.onrender.com'
     }
   ];
 

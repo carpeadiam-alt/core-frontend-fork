@@ -5,12 +5,16 @@ import React, { useState, useEffect } from 'react';
 const SixDegreesGame = () => {
   const [gameData, setGameData] = useState<any>(null);
   const [currentOrder, setCurrentOrder] = useState<string[]>([]);
-  const [attemptsLeft, setAttemptsLeft] = useState(3);
+  const [attemptsLeft, setAttemptsLeft] = useState(5);
   const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing');
   const [showAnswer, setShowAnswer] = useState(false);
   const [expandedConnections, setExpandedConnections] = useState<{[key: number]: boolean}>({});
-  const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [correctUpTo, setCorrectUpTo] = useState<number>(-1);
+  const [firstWrongIndex, setFirstWrongIndex] = useState<number>(-1);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [touchStart, setTouchStart] = useState<{x: number, y: number} | null>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   // Load random game from 6d.json
   useEffect(() => {
@@ -41,6 +45,9 @@ const SixDegreesGame = () => {
         const itemsToShuffle = selectedGame.original_path.slice(1);
         const shuffled = shuffleArray(itemsToShuffle);
         setCurrentOrder([selectedGame.original_path[0], ...shuffled]);
+        setCorrectUpTo(-1);
+        setFirstWrongIndex(-1);
+        setShowFeedback(false);
         setLoading(false);
       } catch (error) {
         console.error('Error loading game data:', error);
@@ -54,26 +61,46 @@ const SixDegreesGame = () => {
   const checkAnswer = () => {
     if (!gameData) return;
     
-    const isCorrect = JSON.stringify(currentOrder) === JSON.stringify(gameData.original_path);
+    // Find how many consecutive items from the start are correct
+    let correctCount = 0;
+    let firstWrong = -1;
+    
+    for (let i = 0; i < currentOrder.length; i++) {
+      if (currentOrder[i] === gameData.original_path[i]) {
+        correctCount++;
+      } else {
+        firstWrong = i;
+        break;
+      }
+    }
+    
+    setCorrectUpTo(correctCount - 1);
+    setFirstWrongIndex(firstWrong);
+    setShowFeedback(true);
+    
+    const isCorrect = correctCount === currentOrder.length;
     
     if (isCorrect) {
       setGameState('won');
-      setShowAnswer(true);
+      setTimeout(() => setShowAnswer(true), 1500);
     } else {
       setAttemptsLeft(attemptsLeft - 1);
       if (attemptsLeft <= 1) {
         setGameState('lost');
-        setShowAnswer(true);
+        setTimeout(() => setShowAnswer(true), 2000);
       }
     }
   };
 
   const resetGame = async () => {
     setLoading(true);
-    setAttemptsLeft(3);
+    setAttemptsLeft(5);
     setGameState('playing');
     setShowAnswer(false);
     setExpandedConnections({});
+    setCorrectUpTo(-1);
+    setFirstWrongIndex(-1);
+    setShowFeedback(false);
     
     try {
       const response = await fetch('/6d.json');
@@ -101,6 +128,9 @@ const SixDegreesGame = () => {
       const itemsToShuffle = selectedGame.original_path.slice(1);
       const shuffled = shuffleArray(itemsToShuffle);
       setCurrentOrder([selectedGame.original_path[0], ...shuffled]);
+      setCorrectUpTo(-1);
+      setFirstWrongIndex(-1);
+      setShowFeedback(false);
       setLoading(false);
     } catch (error) {
       console.error('Error loading game data:', error);
@@ -108,10 +138,46 @@ const SixDegreesGame = () => {
     }
   };
 
+  const moveItem = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === 0 || toIndex === 0) return; // Can't move the first item
+    
+    const newOrder = [...currentOrder];
+    const [movedItem] = newOrder.splice(fromIndex, 1);
+    newOrder.splice(toIndex, 0, movedItem);
+    setCurrentOrder(newOrder);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent, index: number) => {
+    if (index === 0 || gameState !== 'playing') return;
+    
+    const touch = e.touches[0];
+    setTouchStart({ x: touch.clientX, y: touch.clientY });
+    setDraggedIndex(index);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent, dropIndex: number) => {
+    if (!touchStart || draggedIndex === null || draggedIndex === 0 || dropIndex === 0) {
+      setTouchStart(null);
+      setDraggedIndex(null);
+      return;
+    }
+
+    const touch = e.changedTouches[0];
+    const deltaY = touch.clientY - touchStart.y;
+    
+    // Only move if there was significant vertical movement
+    if (Math.abs(deltaY) > 30) {
+      moveItem(draggedIndex, dropIndex);
+    }
+    
+    setTouchStart(null);
+    setDraggedIndex(null);
+  };
+
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-    if (index === 0) return; // Can't drag the first item
-    setDraggedItem(index);
+    if (index === 0 || gameState !== 'playing') return;
     e.dataTransfer.effectAllowed = 'move';
+    setDraggedIndex(index);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -121,20 +187,10 @@ const SixDegreesGame = () => {
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>, dropIndex: number) => {
     e.preventDefault();
-    if (draggedItem === null || draggedItem === 0 || dropIndex === 0) return;
-
-    const newOrder = [...currentOrder];
-    const draggedContent = newOrder[draggedItem];
+    if (draggedIndex === null || draggedIndex === 0 || dropIndex === 0) return;
     
-    // Remove dragged item
-    newOrder.splice(draggedItem, 1);
-    
-    // Insert at new position (adjust index if necessary)
-    const insertIndex = draggedItem < dropIndex ? dropIndex - 1 : dropIndex;
-    newOrder.splice(insertIndex, 0, draggedContent);
-    
-    setCurrentOrder(newOrder);
-    setDraggedItem(null);
+    moveItem(draggedIndex, dropIndex);
+    setDraggedIndex(null);
   };
 
   const toggleConnection = (index: number) => {
@@ -157,12 +213,19 @@ const SixDegreesGame = () => {
     return connection ? connection.connecting_text : '';
   };
 
+  const getItemStatus = (index: number) => {
+    if (!showFeedback) return 'default';
+    if (index <= correctUpTo) return 'correct';
+    if (index === firstWrongIndex) return 'wrong';
+    return 'default';
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading game...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-700 text-sm">Loading...</p>
         </div>
       </div>
     );
@@ -172,10 +235,10 @@ const SixDegreesGame = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">Failed to load game data</p>
+          <p className="text-red-600 mb-4 text-sm">Unable to load game</p>
           <button
             onClick={resetGame}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
           >
             Try Again
           </button>
@@ -185,82 +248,84 @@ const SixDegreesGame = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gray-50 py-4 px-4">
+      <div className="max-w-lg mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Six Degrees</h1>
-          <p className="text-gray-600 mb-4">
-            Arrange the items in the correct order to trace the path from start to finish
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Six Degrees</h1>
+          <p className="text-gray-600 text-sm mb-4">
+            Arrange items to trace the path from start to finish
           </p>
           
           {/* Game Status */}
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Attempts left:</span>
-              <span className={`text-lg font-bold ${attemptsLeft <= 1 ? 'text-red-500' : 'text-blue-500'}`}>
+          <div className="flex items-center justify-center gap-6 mb-4">
+            <div className="text-center">
+              <div className="text-xs text-gray-500 uppercase tracking-wide">Attempts</div>
+              <div className={`text-lg font-bold ${attemptsLeft <= 1 ? 'text-red-600' : 'text-gray-900'}`}>
                 {attemptsLeft}
-              </span>
+              </div>
             </div>
             
             {gameState === 'won' && (
-              <div className="flex items-center gap-1 text-green-600">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span className="font-medium">Solved!</span>
+              <div className="text-center">
+                <div className="text-xs text-green-600 uppercase tracking-wide">Status</div>
+                <div className="text-lg font-bold text-green-600">Solved</div>
               </div>
             )}
             
             {gameState === 'lost' && (
-              <div className="flex items-center gap-1 text-red-600">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <span className="font-medium">Game Over</span>
+              <div className="text-center">
+                <div className="text-xs text-red-600 uppercase tracking-wide">Status</div>
+                <div className="text-lg font-bold text-red-600">Game Over</div>
               </div>
             )}
           </div>
         </div>
 
         {/* Game Board */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div className="bg-white rounded border border-gray-200 p-4 mb-4">
           {!showAnswer ? (
             /* Playing State */
-            <div className="space-y-3">
+            <div className="space-y-2">
               {currentOrder.map((item, index) => (
                 <div
                   key={`${item}-${index}`}
-                  className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                  className={`p-3 rounded border transition-all duration-200 select-none ${
                     index === 0 
-                      ? 'bg-blue-50 border-blue-200 cursor-default' 
+                      ? 'bg-blue-50 border-blue-200' 
                       : gameState === 'playing'
-                        ? 'bg-gray-50 border-gray-200 cursor-move hover:border-blue-300 hover:shadow-md'
+                        ? `bg-white border-gray-200 hover:border-gray-300 cursor-move touch-manipulation ${
+                            getItemStatus(index) === 'correct' ? 'bg-green-50 border-green-300' : 
+                            getItemStatus(index) === 'wrong' ? 'bg-red-50 border-red-300' : ''
+                          }`
                         : 'bg-gray-50 border-gray-200'
-                  }`}
+                  } ${draggedIndex === index ? 'opacity-50 scale-95' : ''}`}
                   draggable={index !== 0 && gameState === 'playing'}
                   onDragStart={(e) => handleDragStart(e, index)}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, index)}
+                  onTouchStart={(e) => handleTouchStart(e, index)}
+                  onTouchEnd={(e) => handleTouchEnd(e, index)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                        index === 0 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'
-                      }`}>
-                        {index + 1}
-                      </div>
-                      <span className="font-medium text-gray-900">{item}</span>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      index === 0 ? 'bg-blue-600 text-white' : 
+                      getItemStatus(index) === 'correct' ? 'bg-green-600 text-white' :
+                      getItemStatus(index) === 'wrong' ? 'bg-red-600 text-white' :
+                      'bg-gray-300 text-gray-700'
+                    }`}>
+                      {index + 1}
                     </div>
+                    <span className="text-sm font-medium text-gray-900 flex-1">{item}</span>
                     
                     {index === 0 && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
                         Start
                       </span>
                     )}
                     
                     {index === currentOrder.length - 1 && index !== 0 && (
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
                         End
                       </span>
                     )}
@@ -270,61 +335,49 @@ const SixDegreesGame = () => {
             </div>
           ) : (
             /* Answer Reveal State */
-            <div className="space-y-8">
+            <div className="space-y-4">
               {gameData.original_path.map((item: string, index: number) => (
-                <div key={item}>
+                <div key={item} className="text-center">
                   {/* Item */}
-                  <div className="flex items-center justify-center">
-                    <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 w-full max-w-md">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-bold">
-                          {index + 1}
-                        </div>
-                        <span className="font-medium text-gray-900">{item}</span>
-                      </div>
+                  <div className="inline-flex items-center gap-2 bg-white border border-gray-300 rounded-full px-4 py-2 mb-2">
+                    <div className="w-5 h-5 rounded-full bg-gray-800 text-white flex items-center justify-center text-xs font-bold">
+                      {index + 1}
                     </div>
+                    <span className="text-sm font-medium text-gray-900">{item}</span>
                   </div>
                   
                   {/* Connection */}
                   {index < gameData.original_path.length - 1 && (
-                    <div className="flex flex-col items-center mt-4">
-                      <div className="w-0.5 h-6 bg-gray-300"></div>
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 max-w-lg mx-4">
-                        <div className="text-sm text-gray-700">
+                    <div className="mt-2 mb-4">
+                      <div className="w-px h-3 bg-gray-300 mx-auto"></div>
+                      <div className="max-w-sm mx-auto">
+                        <div className="text-xs text-gray-600 leading-relaxed px-4 py-2 bg-gray-50 rounded">
                           {expandedConnections[index] ? (
                             <div>
                               <p>{getConnectionText(item, gameData.original_path[index + 1])}</p>
                               <button
                                 onClick={() => toggleConnection(index)}
-                                className="text-blue-500 hover:text-blue-700 text-xs mt-2 flex items-center gap-1"
+                                className="text-blue-600 hover:text-blue-800 mt-1 underline"
                               >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                Show less
+                                less
                               </button>
                             </div>
                           ) : (
                             <div>
-                              <p>{truncateText(getConnectionText(item, gameData.original_path[index + 1]))}</p>
-                              {getConnectionText(item, gameData.original_path[index + 1]).length > 80 && (
+                              <p>{truncateText(getConnectionText(item, gameData.original_path[index + 1]), 60)}</p>
+                              {getConnectionText(item, gameData.original_path[index + 1]).length > 60 && (
                                 <button
                                   onClick={() => toggleConnection(index)}
-                                  className="text-blue-500 hover:text-blue-700 text-xs mt-2 flex items-center gap-1"
+                                  className="text-blue-600 hover:text-blue-800 mt-1 underline"
                                 >
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                  </svg>
-                                  Read more
+                                  more
                                 </button>
                               )}
                             </div>
                           )}
                         </div>
                       </div>
-                      <div className="w-0.5 h-6 bg-gray-300"></div>
+                      <div className="w-px h-3 bg-gray-300 mx-auto"></div>
                     </div>
                   )}
                 </div>
@@ -334,32 +387,39 @@ const SixDegreesGame = () => {
         </div>
 
         {/* Controls */}
-        <div className="flex gap-3 justify-center">
+        <div className="space-y-3">
           {!showAnswer && gameState === 'playing' && (
             <button
               onClick={checkAnswer}
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+              className="w-full py-3 bg-gray-900 text-white rounded text-sm font-medium hover:bg-gray-800 transition-colors"
             >
-              Check Answer
+              Submit
             </button>
           )}
           
           <button
             onClick={resetGame}
-            className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium flex items-center gap-2"
+            className="w-full py-3 bg-gray-200 text-gray-700 rounded text-sm font-medium hover:bg-gray-300 transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
             New Game
           </button>
         </div>
 
+        {/* Feedback */}
+        {showFeedback && !showAnswer && firstWrongIndex !== -1 && (
+          <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded text-center">
+            <p className="text-sm text-orange-800">
+              Position {firstWrongIndex + 1} is incorrect. Items 1-{correctUpTo + 1} are in the right place.
+            </p>
+          </div>
+        )}
+
         {/* Instructions */}
-        {!showAnswer && (
-          <div className="mt-8 text-center text-sm text-gray-600">
-            <p>The first item is fixed. Drag and drop the other items to arrange them in the correct order.</p>
-            <p className="mt-1">You have 3 attempts to find the correct path!</p>
+        {!showAnswer && !showFeedback && (
+          <div className="mt-6 text-center">
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Drag items to reorder them. The first item cannot be moved.
+            </p>
           </div>
         )}
       </div>
