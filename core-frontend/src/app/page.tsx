@@ -77,7 +77,7 @@ export default function Home() {
       id: 'trivia',
       title: 'Trivia',
       subtitle: 'Easy and Medium modes',
-      icon: '/icons/trivia.svg',
+      icon: '/icons/trivia (1).svg',
       href: 'https://thecodeworks.in/coreTries/trivia.html'
     },
     {
