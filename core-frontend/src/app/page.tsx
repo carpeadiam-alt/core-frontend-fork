@@ -84,23 +84,37 @@ export default function Home() {
       id: 'tenet',
       title: 'Tenet',
       subtitle: 'Find all words through flips',
-      icon: '/icons/tenet.svg',
+      icon: '/icons/tnt.svg',
       href: '/tenetw'
     },
     {
       id: 'shuffle',
       title: 'Shuffle',
       subtitle: 'Lock all pairs in this memory',
-      icon: '/icons/shuffle.svg',
+      icon: '/icons/shf.svg',
       href: 'https://thecodeworks.in/coreTries/shuffle.html'
     },
     {
       id: 'wordual',
       title: 'Wordual',
       subtitle: 'A two player twist on Wordle!',
-      icon: '/icons/wordual.svg',
+      icon: '/icons/wd.svg',
       href: 'https://wordual.onrender.com'
-    }
+    },
+    {
+      id: 'six degrees',
+      title: 'Six Degrees',
+      subtitle: 'The Connections Pt II',
+      icon: '/icons/sd.svg',
+      href: '/sixdegrees'
+    },
+    {
+      id: 'wikisprint',
+      title: 'Wikisprint',
+      subtitle: 'Hop from link to link to get to the goal',
+      icon: '/icons/ws.svg',
+      href: 'https://wikisprint.vercel.app/'
+    },
   ];
 
   return (
