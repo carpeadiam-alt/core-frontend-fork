@@ -18,16 +18,20 @@ const yuseiMagic = {
 
 export default function Home() {
   const [greeting, setGreeting] = useState('Good Morning');
+  const [isEvening, setIsEvening] = useState(false);
 
   useEffect(() => {
     const updateGreeting = () => {
       const hour = new Date().getHours();
       if (hour < 12) {
         setGreeting('Good Morning');
+        setIsEvening(false);
       } else if (hour < 18) {
         setGreeting('Good Afternoon');
+        setIsEvening(false);
       } else {
         setGreeting('Good Evening');
+        setIsEvening(true);
       }
     };
 
@@ -36,6 +40,13 @@ export default function Home() {
     const interval = setInterval(updateGreeting, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  // Image dimensions (you can adjust these)
+  const timeIconWidth = 100;
+  const timeIconHeight = 100;
+  
+  // Placeholder paths for time-based images
+  const timeBasedImagePath = isEvening ? '/icons/night.svg' : '/icons/day.svg';
 
   const gameOptions = [
     {
@@ -126,6 +137,17 @@ export default function Home() {
         <div className="max-w-md mx-auto px-4 py-8">
           {/* Header */}
           <div className="text-center mb-8">
+            {/* Time-based SVG Icon */}
+            <div className="flex justify-center mb-4">
+              <Image
+                src={timeBasedImagePath}
+                alt={`${greeting} icon`}
+                width={timeIconWidth}
+                height={timeIconHeight}
+                className="object-contain"
+              />
+            </div>
+            
             <h1 className="text-2xl font-medium text-gray-900 mb-2">
               {greeting}
             </h1>
