@@ -45,6 +45,8 @@ export default function ConnectionsGame() {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [showOneAway, setShowOneAway] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showGameComplete, setShowGameComplete] = useState(false);
 
   const MAX_MISTAKES = 4;
 
@@ -65,6 +67,14 @@ export default function ConnectionsGame() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const getFontSize = (word: string) => {
+    const length = word.length;
+    if (length <= 4) return 'text-lg';
+    if (length <= 6) return 'text-base';
+    if (length <= 8) return 'text-sm';
+    return 'text-xs';
   };
 
   const handleWordClick = (word: string) => {
@@ -131,6 +141,7 @@ export default function ConnectionsGame() {
       if (newFoundCategories.length === 4) {
         setGameStatus('won');
         setMessage('Congratulations! You solved all categories!');
+        setShowGameComplete(true);
       }
     } else {
       // Wrong guess - check if one away
@@ -162,6 +173,7 @@ export default function ConnectionsGame() {
       if (newMistakes >= MAX_MISTAKES) {
         setGameStatus('lost');
         setMessage('Game over! Better luck next time.');
+        setShowGameComplete(true);
         // Reveal remaining categories
         revealRemainingCategories();
       }
@@ -207,12 +219,13 @@ export default function ConnectionsGame() {
       setGameStatus('playing');
       setMessage('');
       setShowOneAway(false);
+      setShowGameComplete(false);
     }
   };
 
   if (isLoading) {
     return (
-      <div className={`min-h-screen bg-gray-50 flex items-center justify-center ${rubik.variable} font-sans`}>
+      <div className={`min-h-screen bg-white flex items-center justify-center ${rubik.variable} font-sans`}>
         <div className="text-xl">Loading game...</div>
       </div>
     );
@@ -220,7 +233,7 @@ export default function ConnectionsGame() {
 
   if (!gameData) {
     return (
-      <div className={`min-h-screen bg-gray-50 flex items-center justify-center ${rubik.variable} font-sans`}>
+      <div className={`min-h-screen bg-white flex items-center justify-center ${rubik.variable} font-sans`}>
         <div className="text-xl text-red-600">Failed to load game data</div>
       </div>
     );
@@ -232,8 +245,71 @@ export default function ConnectionsGame() {
   });
 
   return (
-    <div className={`min-h-screen bg-white ${rubik.variable} font-sans`}>
-      {/* Header */}
+    <div className={`min-h-screen bg-white ${rubik.variable} font-sans relative`}>
+      {/* How To Play Button */}
+      <div className="absolute top-4 right-4 z-10">
+        <button
+          onClick={() => setShowHowToPlay(true)}
+          className="px-4 py-2 bg-white text-black rounded-lg border border-black font-semibold hover:bg-gray-50 transition-all"
+        >
+          How to Play
+        </button>
+      </div>
+
+      {/* How To Play Popup */}
+      {showHowToPlay && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg max-w-md mx-4 relative">
+            <button
+              onClick={() => setShowHowToPlay(false)}
+              className="absolute top-4 right-4 w-8 h-8 bg-white border border-black rounded-full flex items-center justify-center font-bold hover:bg-gray-50"
+            >
+              ×
+            </button>
+            <h2 className="text-2xl font-bold mb-4">How to Play</h2>
+            <div className="space-y-3 text-sm">
+              <p>Find groups of four items that share something in common.</p>
+              <p>Select four words and tap Submit to check if your guess is correct.</p>
+              <p>Categories are grouped by difficulty:</p>
+              <ul className="ml-4 space-y-1">
+                <li><span className="inline-block w-4 h-4 bg-yellow-300 mr-2"></span>Easiest</li>
+                <li><span className="inline-block w-4 h-4 bg-green-300 mr-2"></span>Easy</li>
+                <li><span className="inline-block w-4 h-4 bg-blue-300 mr-2"></span>Medium</li>
+                <li><span className="inline-block w-4 h-4 bg-purple-300 mr-2"></span>Hard</li>
+              </ul>
+              <p>You have 4 mistakes before the game ends.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Game Complete Popup */}
+      {showGameComplete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg max-w-md mx-4 relative text-center">
+            <button
+              onClick={() => setShowGameComplete(false)}
+              className="absolute top-4 right-4 w-8 h-8 bg-white border border-black rounded-full flex items-center justify-center font-bold hover:bg-gray-50"
+            >
+              ×
+            </button>
+            <h2 className="text-2xl font-bold mb-4">
+              {gameStatus === 'won' ? 'Congratulations!' : 'Game Over'}
+            </h2>
+            <p className="mb-6">
+              {gameStatus === 'won' 
+                ? 'You successfully solved all categories!' 
+                : 'Better luck next time!'}
+            </p>
+            <button
+              onClick={resetGame}
+              className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-all font-bold"
+            >
+              Play Again
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Game Content */}
       <div className="max-w-2xl mx-auto px-6 py-8">
@@ -243,7 +319,7 @@ export default function ConnectionsGame() {
             {sortedFoundCategories.map((category, index) => (
               <div
                 key={index}
-                className={`p-5 rounded-lg ${DIFFICULTY_COLORS[category.difficulty]} shadow-sm border-2 border-transparent`}
+                className={`p-5 rounded-lg ${DIFFICULTY_COLORS[category.difficulty]} border-2 border-transparent`}
               >
                 <div className="text-center">
                   <div className="font-bold text-black text-xl mb-2 tracking-wide">
@@ -266,12 +342,13 @@ export default function ConnectionsGame() {
                 key={index}
                 onClick={() => handleWordClick(word)}
                 className={`
-                  aspect-square flex items-center justify-center rounded-lg font-bold text-lg uppercase transition-all duration-150 border-2
+                  h-20 flex items-center justify-center rounded-lg font-bold uppercase transition-all duration-150 border
                   ${selectedWords.includes(word)
-                    ? 'bg-pink-300 text-black border-gray-800 transform scale-95 shadow-inner'
-                    : 'bg-gray-100 text-black border-gray-300 hover:bg-gray-200 shadow-sm'
+                    ? 'bg-pink-300 text-black border-gray-800 transform scale-95'
+                    : 'bg-white text-black border-black hover:bg-gray-50'
                   }
-                  ${gameStatus !== 'playing' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:shadow-md'}
+                  ${gameStatus !== 'playing' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
+                  ${getFontSize(word)}
                 `}
                 disabled={gameStatus !== 'playing'}
               >
@@ -319,20 +396,20 @@ export default function ConnectionsGame() {
             <div className="flex flex-wrap justify-center gap-3">
               <button
                 onClick={shuffleWords}
-                className="px-6 py-3 bg-white text-black rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-all font-semibold text-lg hover:shadow-md"
+                className="px-5 py-2 bg-white text-black rounded-full border border-black hover:bg-gray-50 transition-all font-semibold text-base"
               >
                 Shuffle
               </button>
               <button
                 onClick={deselectOne}
-                className="px-6 py-3 bg-white text-black rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-all font-semibold text-lg hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 py-2 bg-white text-black rounded-full border border-black hover:bg-gray-50 transition-all font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={selectedWords.length === 0}
               >
                 Deselect one
               </button>
               <button
                 onClick={clearSelection}
-                className="px-6 py-3 bg-white text-black rounded-full border-2 border-gray-300 hover:bg-gray-50 transition-all font-semibold text-lg hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 py-2 bg-white text-black rounded-full border border-black hover:bg-gray-50 transition-all font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={selectedWords.length === 0}
               >
                 Clear all
@@ -341,26 +418,14 @@ export default function ConnectionsGame() {
             
             <button
               onClick={checkGuess}
-              className={`px-12 py-4 rounded-full font-bold text-xl transition-all border-2 ${
+              className={`px-10 py-3 rounded-full font-bold text-lg transition-all border ${
                 selectedWords.length === 4
-                  ? 'bg-black text-white border-black hover:bg-gray-800 shadow-lg hover:shadow-xl transform hover:scale-105'
+                  ? 'bg-black text-white border-black hover:bg-gray-800 transform hover:scale-105'
                   : 'bg-gray-200 text-gray-500 border-gray-200 cursor-not-allowed'
               }`}
               disabled={selectedWords.length !== 4}
             >
               Submit
-            </button>
-          </div>
-        )}
-
-        {/* Reset Button */}
-        {(gameStatus === 'won' || gameStatus === 'lost') && (
-          <div className="text-center">
-            <button
-              onClick={resetGame}
-              className="px-12 py-4 bg-black text-white rounded-full hover:bg-gray-800 transition-all font-bold text-xl shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              Play Again
             </button>
           </div>
         )}
