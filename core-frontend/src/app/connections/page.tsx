@@ -245,28 +245,29 @@ export default function ConnectionsGame() {
   });
 
   return (
-    <div className={`min-h-screen bg-white ${rubik.variable} font-sans relative`}>
-      {/* How To Play Button */}
-      <div className="absolute top-4 right-4 z-10">
-        <button
-          onClick={() => setShowHowToPlay(true)}
-          className="px-4 py-2 bg-white text-black rounded-lg border border-black font-semibold hover:bg-gray-50 transition-all"
-        >
-          How to Play
-        </button>
+    <div className={`min-h-screen bg-white ${rubik.variable} font-sans`}>
+      <div className="w-full bg-white py-4 px-6">
+        <div className="max-w-2xl mx-auto flex justify-end items-center">
+          <button
+            onClick={() => setShowHowToPlay(true)}
+            className="w-8 h-8 bg-white text-black rounded-full border border-black font-bold hover:bg-gray-50 transition-all flex items-center justify-center"
+          >
+            i
+          </button>
+        </div>
       </div>
 
       {/* How To Play Popup */}
       {showHowToPlay && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-lg max-w-md mx-4 relative">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white border-1 border-black p-6 rounded-lg max-w-sm mx-4 relative">
             <button
               onClick={() => setShowHowToPlay(false)}
-              className="absolute top-4 right-4 w-8 h-8 bg-white border border-black rounded-full flex items-center justify-center font-bold hover:bg-gray-50"
+              className="absolute top-2 right-2 w-6 h-6 bg-white  rounded-full flex items-center justify-center text-m font-bold hover:bg-gray-50"
             >
               ×
             </button>
-            <h2 className="text-2xl font-bold mb-4">How to Play</h2>
+            <h2 className="text-xl font-bold mb-4">How to Play</h2>
             <div className="space-y-3 text-sm">
               <p>Find groups of four items that share something in common.</p>
               <p>Select four words and tap Submit to check if your guess is correct.</p>
@@ -285,11 +286,11 @@ export default function ConnectionsGame() {
 
       {/* Game Complete Popup */}
       {showGameComplete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-lg max-w-md mx-4 relative text-center">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white border-2 border-black p-8 rounded-lg max-w-md mx-4 shadow-xl text-center relative">
             <button
               onClick={() => setShowGameComplete(false)}
-              className="absolute top-4 right-4 w-8 h-8 bg-white border border-black rounded-full flex items-center justify-center font-bold hover:bg-gray-50"
+              className="absolute top-2 right-2 w-6 h-6 bg-white border border-black rounded-full flex items-center justify-center text-sm font-bold hover:bg-gray-50"
             >
               ×
             </button>
@@ -312,7 +313,7 @@ export default function ConnectionsGame() {
       )}
 
       {/* Game Content */}
-      <div className="max-w-2xl mx-auto px-6 py-8">
+      <main className="max-w-2xl mx-auto px-6 py-8">
         {/* Found Categories */}
         {sortedFoundCategories.length > 0 && (
           <div className="space-y-3 mb-8">
@@ -429,7 +430,7 @@ export default function ConnectionsGame() {
             </button>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

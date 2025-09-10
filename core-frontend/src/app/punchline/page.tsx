@@ -60,13 +60,19 @@ export default function JokeFlashcards() {
   }
 
   const nextJoke = () => {
-    setCurrentIndex((prev) => (prev + 1) % jokes.length)
-    setIsFlipped(false)
+    setIsFlipped(false) // Reset to setup side first
+    // Small delay to ensure the flip animation completes before changing content
+    setTimeout(() => {
+      setCurrentIndex((prev) => (prev + 1) % jokes.length)
+    }, 200)
   }
 
   const prevJoke = () => {
-    setCurrentIndex((prev) => (prev - 1 + jokes.length) % jokes.length)
-    setIsFlipped(false)
+    setIsFlipped(false) // Reset to setup side first
+    // Small delay to ensure the flip animation completes before changing content
+    setTimeout(() => {
+      setCurrentIndex((prev) => (prev - 1 + jokes.length) % jokes.length)
+    }, 200)
   }
 
   const resetCard = () => {
@@ -75,7 +81,7 @@ export default function JokeFlashcards() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg">Loading jokes...</p>
@@ -86,7 +92,7 @@ export default function JokeFlashcards() {
 
   if (jokes.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 text-lg">No jokes available</p>
         </div>
@@ -97,32 +103,22 @@ export default function JokeFlashcards() {
   const currentJoke = jokes[currentIndex]
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Joke Cards</h1>
-            <p className="text-sm text-gray-600 mt-1">Click the card to reveal the punchline</p>
-          </div>
-          {error && (
-            <div className="text-xs text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
-              {error}
-            </div>
-          )}
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center p-6">
         <div className="max-w-4xl w-full">
           {/* Card Counter */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center bg-white rounded-full px-4 py-2 shadow-sm border border-gray-200">
+            <div className="inline-flex items-center bg-white rounded-full px-4 py-2 shadow-sm border border-black">
               <span className="text-sm font-medium text-gray-700">
                 {currentIndex + 1} of {jokes.length}
               </span>
             </div>
+            {error && (
+              <div className="text-xs text-orange-600 bg-orange-50 px-3 py-1 rounded-full mt-2 border border-black">
+                {error}
+              </div>
+            )}
           </div>
 
           {/* Card Container */}
@@ -131,7 +127,7 @@ export default function JokeFlashcards() {
             <button
               onClick={prevJoke}
               disabled={jokes.length <= 1}
-              className="absolute left-0 z-10 p-3 rounded-full bg-white shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute left-0 z-10 p-3 rounded-full bg-white  border border-black hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -152,7 +148,7 @@ export default function JokeFlashcards() {
               >
                 {/* Front of card */}
                 <div
-                  className="absolute inset-0 bg-white rounded-2xl shadow-xl border border-gray-200 p-8 flex items-center justify-center backface-hidden"
+                  className="absolute inset-0 bg-white rounded-2xl  border border-black p-8 flex items-center justify-center backface-hidden"
                   style={{ backfaceVisibility: 'hidden' }}
                 >
                   <div className="text-center">
@@ -170,7 +166,7 @@ export default function JokeFlashcards() {
 
                 {/* Back of card */}
                 <div
-                  className="absolute inset-0 bg-white rounded-2xl shadow-xl border border-gray-200 p-8 flex items-center justify-center backface-hidden"
+                  className="absolute inset-0 bg-white rounded-2xl  border border-black p-8 flex items-center justify-center backface-hidden"
                   style={{ 
                     backfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)'
@@ -195,7 +191,7 @@ export default function JokeFlashcards() {
             <button
               onClick={nextJoke}
               disabled={jokes.length <= 1}
-              className="absolute right-0 z-10 p-3 rounded-full bg-white shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute right-0 z-10 p-3 rounded-full bg-white  border border-black hover:shadow-lg transition-all duration-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -207,7 +203,7 @@ export default function JokeFlashcards() {
           <div className="flex justify-center mt-8 gap-4">
             <button
               onClick={resetCard}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 text-sm font-medium text-gray-700"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-black rounded-full shadow-sm border border-black hover:shadow-md transition-all duration-100 text-sm font-medium text-white"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -222,8 +218,10 @@ export default function JokeFlashcards() {
               <button
                 key={index}
                 onClick={() => {
-                  setCurrentIndex(index)
                   setIsFlipped(false)
+                  setTimeout(() => {
+                    setCurrentIndex(index)
+                  }, 100)
                 }}
                 className={`w-2 h-2 rounded-full transition-all duration-200 ${
                   index === currentIndex
