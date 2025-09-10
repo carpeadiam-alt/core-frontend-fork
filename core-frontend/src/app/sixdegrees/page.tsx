@@ -1,6 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Rubik } from 'next/font/google';
+
+const rubik = Rubik({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-rubik',
+});
 
 const SixDegreesGame = () => {
   const [gameData, setGameData] = useState<any>(null);
@@ -15,6 +22,7 @@ const SixDegreesGame = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [touchStart, setTouchStart] = useState<{x: number, y: number} | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   // Load random game from 6d.json
   useEffect(() => {
@@ -222,9 +230,9 @@ const SixDegreesGame = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className={`${rubik.variable} font-sans min-h-screen bg-white flex items-center justify-center`}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
           <p className="text-gray-700 text-sm">Loading...</p>
         </div>
       </div>
@@ -233,12 +241,12 @@ const SixDegreesGame = () => {
 
   if (!gameData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className={`${rubik.variable} font-sans min-h-screen bg-white flex items-center justify-center`}>
         <div className="text-center">
           <p className="text-red-600 mb-4 text-sm">Unable to load game</p>
           <button
             onClick={resetGame}
-            className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-black text-white rounded-full text-sm hover:bg-gray-800 transition-colors"
           >
             Try Again
           </button>
@@ -248,58 +256,109 @@ const SixDegreesGame = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 px-4">
-      <div className="max-w-lg mx-auto">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Six Degrees</h1>
-          <p className="text-gray-600 text-sm mb-4">
-            Arrange items to trace the path from start to finish
-          </p>
-          
-          {/* Game Status */}
-          <div className="flex items-center justify-center gap-6 mb-4">
-            <div className="text-center">
-              <div className="text-xs text-gray-500 uppercase tracking-wide">Attempts</div>
-              <div className={`text-lg font-bold ${attemptsLeft <= 1 ? 'text-red-600' : 'text-gray-900'}`}>
-                {attemptsLeft}
-              </div>
+    <div className={`${rubik.variable} font-sans min-h-screen bg-white`}>
+      {/* Header with Info Button - Removed title and border */}
+      <div className="w-full bg-white py-4 px-6">
+        <div className="max-w-2xl mx-auto flex justify-end">
+          <button
+            onClick={() => setShowHowToPlay(true)}
+            className="w-8 h-8 bg-white text-black rounded-full border border-black font-bold hover:bg-gray-50 transition-all flex items-center justify-center"
+          >
+            i
+          </button>
+        </div>
+      </div>
+
+      {/* How To Play Popup */}
+      {showHowToPlay && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white border border-black p-6 rounded-lg max-w-sm mx-4 relative">
+            <button
+              onClick={() => setShowHowToPlay(false)}
+              className="absolute top-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center text-sm font-bold hover:bg-gray-50"
+            >
+              ×
+            </button>
+            <h2 className="text-xl font-bold mb-4">How to Play</h2>
+            <div className="space-y-3 text-sm">
+              <p>Arrange items to trace the path from start to finish.</p>
+              <p>Drag and drop items to reorder them.</p>
+              <p>The first item is fixed and cannot be moved.</p>
+              <p>You have 5 attempts to solve the puzzle.</p>
+              <p>After each submission, you'll see which items are in the correct position.</p>
             </div>
-            
-            {gameState === 'won' && (
-              <div className="text-center">
-                <div className="text-xs text-green-600 uppercase tracking-wide">Status</div>
-                <div className="text-lg font-bold text-green-600">Solved</div>
-              </div>
-            )}
-            
-            {gameState === 'lost' && (
-              <div className="text-center">
-                <div className="text-xs text-red-600 uppercase tracking-wide">Status</div>
-                <div className="text-lg font-bold text-red-600">Game Over</div>
-              </div>
-            )}
           </div>
         </div>
+      )}
 
-        {/* Game Board */}
-        <div className="bg-white rounded border border-gray-200 p-4 mb-4">
+      {/* Game Complete Popup */}
+      {(gameState === 'won' || gameState === 'lost') && showAnswer && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white border border-black p-8 rounded-lg max-w-md mx-4 shadow-xl text-center relative">
+            <button
+              onClick={() => setShowAnswer(false)}
+              className="absolute top-2 right-2 w-6 h-6 bg-white border border-black rounded-full flex items-center justify-center text-sm font-bold hover:bg-gray-50"
+            >
+              ×
+            </button>
+            <h2 className="text-2xl font-bold mb-4">
+              {gameState === 'won' ? 'Perfect Solution!' : 'Game Over'}
+            </h2>
+            <p className="mb-6">
+              {gameState === 'won' 
+                ? 'You solved the puzzle!' 
+                : 'Better luck next time!'}
+            </p>
+            <button
+              onClick={resetGame}
+              className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-all font-bold"
+            >
+              Play Again
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Game Content */}
+      <main className="max-w-2xl mx-auto px-6 py-8">
+        {/* Game Stats */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-center">
+            <div className="text-lg font-bold text-black">{attemptsLeft}</div>
+            <div className="text-xs text-gray-600">ATTEMPTS LEFT</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-black">
+              {correctUpTo >= 0 ? correctUpTo + 1 : 0}/{currentOrder.length}
+            </div>
+            <div className="text-xs text-gray-600">CORRECT POSITIONS</div>
+          </div>
+          <button
+            onClick={resetGame}
+            className="px-4 py-2 bg-white text-black rounded-full border border-black hover:bg-gray-50 transition-all font-semibold text-sm"
+          >
+            New Game
+          </button>
+        </div>
+
+        {/* Game Board - Removed surrounding border */}
+        <div className="bg-white p-6 mb-8">
           {!showAnswer ? (
             /* Playing State */
-            <div className="space-y-2">
+            <div className="space-y-3">
               {currentOrder.map((item, index) => (
                 <div
                   key={`${item}-${index}`}
-                  className={`p-3 rounded border transition-all duration-200 select-none ${
+                  className={`p-4 rounded-lg border transition-all duration-200 select-none ${
                     index === 0 
-                      ? 'bg-blue-50 border-blue-200' 
+                      ? 'bg-[#00BDA1] border-black' 
                       : gameState === 'playing'
-                        ? `bg-white border-gray-200 hover:border-gray-300 cursor-move touch-manipulation ${
-                            getItemStatus(index) === 'correct' ? 'bg-green-50 border-green-300' : 
-                            getItemStatus(index) === 'wrong' ? 'bg-red-50 border-red-300' : ''
+                        ? `bg-white border-black hover:shadow-md cursor-move ${
+                            getItemStatus(index) === 'correct' ? 'bg-green-300 border-green-400' : 
+                            getItemStatus(index) === 'wrong' ? 'bg-red-300 border-red-400' : ''
                           }`
-                        : 'bg-gray-50 border-gray-200'
-                  } ${draggedIndex === index ? 'opacity-50 scale-95' : ''}`}
+                        : 'bg-gray-100 border-gray-300'
+                  } ${draggedIndex === index ? 'opacity-70 scale-95' : ''}`}
                   draggable={index !== 0 && gameState === 'playing'}
                   onDragStart={(e) => handleDragStart(e, index)}
                   onDragOver={handleDragOver}
@@ -307,26 +366,26 @@ const SixDegreesGame = () => {
                   onTouchStart={(e) => handleTouchStart(e, index)}
                   onTouchEnd={(e) => handleTouchEnd(e, index)}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      index === 0 ? 'bg-blue-600 text-white' : 
+                  <div className="flex items-center gap-4">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                      index === 0 ? 'bg-black text-white' : 
                       getItemStatus(index) === 'correct' ? 'bg-green-600 text-white' :
                       getItemStatus(index) === 'wrong' ? 'bg-red-600 text-white' :
-                      'bg-gray-300 text-gray-700'
+                      'bg-gray-400 text-white'
                     }`}>
                       {index + 1}
                     </div>
-                    <span className="text-sm font-medium text-gray-900 flex-1">{item}</span>
+                    <span className="text-lg font-bold text-black flex-1">{item}</span>
                     
                     {index === 0 && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                        Start
+                      <span className="text-xs bg-black text-white px-3 py-1 rounded font-bold">
+                        START
                       </span>
                     )}
                     
                     {index === currentOrder.length - 1 && index !== 0 && (
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                        End
+                      <span className="text-xs bg-green-600 text-white px-3 py-1 rounded font-bold">
+                        END
                       </span>
                     )}
                   </div>
@@ -335,49 +394,49 @@ const SixDegreesGame = () => {
             </div>
           ) : (
             /* Answer Reveal State */
-            <div className="space-y-4">
+            <div className="space-y-6">
               {gameData.original_path.map((item: string, index: number) => (
                 <div key={item} className="text-center">
                   {/* Item */}
-                  <div className="inline-flex items-center gap-2 bg-white border border-gray-300 rounded-full px-4 py-2 mb-2">
-                    <div className="w-5 h-5 rounded-full bg-gray-800 text-white flex items-center justify-center text-xs font-bold">
+                  <div className="inline-flex items-center gap-3 bg-white border rounded-lg px-5 py-3 mb-3">
+                    <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center text-sm font-bold">
                       {index + 1}
                     </div>
-                    <span className="text-sm font-medium text-gray-900">{item}</span>
+                    <span className="text-lg font-bold text-black">{item}</span>
                   </div>
                   
                   {/* Connection */}
                   {index < gameData.original_path.length - 1 && (
-                    <div className="mt-2 mb-4">
-                      <div className="w-px h-3 bg-gray-300 mx-auto"></div>
-                      <div className="max-w-sm mx-auto">
-                        <div className="text-xs text-gray-600 leading-relaxed px-4 py-2 bg-gray-50 rounded">
+                    <div className="mt-4 mb-6">
+                      <div className="w-1 h-4 bg-black mx-auto"></div>
+                      <div className="max-w-lg mx-auto">
+                        <div className="text-sm text-gray-800 leading-relaxed px-5 py-3 bg-gray-100 rounded-lg border">
                           {expandedConnections[index] ? (
                             <div>
-                              <p>{getConnectionText(item, gameData.original_path[index + 1])}</p>
+                              <p className="text-center">{getConnectionText(item, gameData.original_path[index + 1])}</p>
                               <button
                                 onClick={() => toggleConnection(index)}
-                                className="text-blue-600 hover:text-blue-800 mt-1 underline"
+                                className="text-black hover:text-gray-700 mt-2 underline font-bold"
                               >
-                                less
+                                Show less
                               </button>
                             </div>
                           ) : (
                             <div>
-                              <p>{truncateText(getConnectionText(item, gameData.original_path[index + 1]), 60)}</p>
-                              {getConnectionText(item, gameData.original_path[index + 1]).length > 60 && (
+                              <p className="text-center">{truncateText(getConnectionText(item, gameData.original_path[index + 1]), 80)}</p>
+                              {getConnectionText(item, gameData.original_path[index + 1]).length > 80 && (
                                 <button
                                   onClick={() => toggleConnection(index)}
-                                  className="text-blue-600 hover:text-blue-800 mt-1 underline"
+                                  className="text-black hover:text-gray-700 mt-2 underline font-bold"
                                 >
-                                  more
+                                  Show more
                                 </button>
                               )}
                             </div>
                           )}
                         </div>
                       </div>
-                      <div className="w-px h-3 bg-gray-300 mx-auto"></div>
+                      <div className="w-1 h-4 bg-black mx-auto"></div>
                     </div>
                   )}
                 </div>
@@ -386,29 +445,24 @@ const SixDegreesGame = () => {
           )}
         </div>
 
-        {/* Controls */}
-        <div className="space-y-3">
-          {!showAnswer && gameState === 'playing' && (
-            <button
-              onClick={checkAnswer}
-              className="w-full py-3 bg-gray-900 text-white rounded text-sm font-medium hover:bg-gray-800 transition-colors"
-            >
-              Submit
-            </button>
-          )}
-          
-          <button
-            onClick={resetGame}
-            className="w-full py-3 bg-gray-200 text-gray-700 rounded text-sm font-medium hover:bg-gray-300 transition-colors"
-          >
-            New Game
-          </button>
-        </div>
+        {/* Controls - Made buttons smaller and oval like NYT Games */}
+<div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+  {!showAnswer && gameState === 'playing' && (
+    <button
+      onClick={checkAnswer}
+      className="px-6 py-2 bg-black text-white rounded-full text-sm font-bold hover:bg-gray-800 transition-colors border border-black min-w-[120px] max-w-[150px]"
+    >
+      Submit
+    </button>
+  )}
+  
+
+</div>
 
         {/* Feedback */}
         {showFeedback && !showAnswer && firstWrongIndex !== -1 && (
-          <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded text-center">
-            <p className="text-sm text-orange-800">
+          <div className="mt-6 p-4 bg-yellow-100 border border-yellow-300 rounded-lg text-center">
+            <p className="text-sm font-bold text-yellow-800">
               Position {firstWrongIndex + 1} is incorrect. Items 1-{correctUpTo + 1} are in the right place.
             </p>
           </div>
@@ -417,12 +471,12 @@ const SixDegreesGame = () => {
         {/* Instructions */}
         {!showAnswer && !showFeedback && (
           <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500 leading-relaxed">
+            <p className="text-sm text-gray-600 leading-relaxed">
               Drag items to reorder them. The first item cannot be moved.
             </p>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };
