@@ -38,7 +38,6 @@ const wordList = [
   "bloke", "vivid", "spill", "chant", "choke", "rupee", "nasty", "mourn", "ahead", "brine"
 ];
 
-
 const fixedPositions = new Set(['0,0', '0,4', '4,0', '4,4', '2,2']);
 
 export default function TenetGame() {
@@ -50,6 +49,8 @@ export default function TenetGame() {
   const [selectionMode, setSelectionMode] = useState<'row' | 'col'>('row');
   const [gameStatus, setGameStatus] = useState<'playing' | 'perfect' | 'all_words'>('playing');
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showGameComplete, setShowGameComplete] = useState(false);
 
   // Initialize game
   useEffect(() => {
@@ -90,6 +91,7 @@ export default function TenetGame() {
     setSelectedCell(null);
     setGameStatus('playing');
     setShowCelebration(false);
+    setShowGameComplete(false);
   };
 
   const reverseRowOnBoard = (board: string[][], row: number): string[][] => {
@@ -155,9 +157,11 @@ export default function TenetGame() {
     if (isPerfect) {
       setGameStatus('perfect');
       setShowCelebration(true);
+      setShowGameComplete(true);
     } else if (newSolved.size === 5) {
       setGameStatus('all_words');
       setShowCelebration(true);
+      setShowGameComplete(true);
     }
   };
 
@@ -211,58 +215,119 @@ export default function TenetGame() {
   const highlightedCells = getHighlightedCells();
 
   return (
-    <div className={`${rubik.variable} font-sans min-h-screen bg-white p-4`}>
-      <div className="max-w-md mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">TENET</h1>
-          <p className="text-gray-600 text-sm">
-            Flip rows and columns to restore the original words
-          </p>
+    <div className={`${rubik.variable} font-sans min-h-screen bg-white`}>
+      {/* Header with Info Button - moved to right side */}
+      <div className="w-full bg-white py-4 px-6">
+        <div className="max-w-2xl mx-auto flex justify-end">
+          <button
+            onClick={() => setShowHowToPlay(true)}
+            className="w-8 h-8 bg-white text-black rounded-full border border-black font-bold hover:bg-gray-50 transition-all flex items-center justify-center"
+          >
+            i
+          </button>
         </div>
+      </div>
 
+      {/* How To Play Popup */}
+      {showHowToPlay && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white border-2 border-black p-6 rounded-lg max-w-sm mx-4 relative">
+            <button
+              onClick={() => setShowHowToPlay(false)}
+              className="absolute top-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center text-sm font-bold hover:bg-gray-50"
+            >
+              ×
+            </button>
+            <h2 className="text-xl font-bold mb-4">How to Play</h2>
+            <div className="space-y-3 text-sm">
+              <p>Flip rows and columns to restore the original words.</p>
+              <p>Click a cell to select its row, click again to select its column.</p>
+              <p>Click the circular flip button to reverse the selected row or column.</p>
+              <p>🟡 Yellow cells are fixed positions that won't change when flipping.</p>
+              <p>Goal: Restore the original words or find all 5 words.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Game Complete Popup */}
+      {showGameComplete && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white border-2 border-black p-8 rounded-lg max-w-md mx-4 shadow-xl text-center relative">
+            <button
+              onClick={() => setShowGameComplete(false)}
+              className="absolute top-2 right-2 w-6 h-6 bg-white border border-black rounded-full flex items-center justify-center text-sm font-bold hover:bg-gray-50"
+            >
+              ×
+            </button>
+            <h2 className="text-2xl font-bold mb-4">
+              {gameStatus === 'perfect' ? 'Perfect Solution!' : 'Well Done!'}
+            </h2>
+            <p className="mb-6">
+              {gameStatus === 'perfect' 
+                ? 'You restored the board to its original state!' 
+                : 'You found all the original words!'}
+            </p>
+            <button
+              onClick={initializeGame}
+              className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-all font-bold"
+            >
+              Play Again
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Game Content */}
+      <main className="max-w-2xl mx-auto px-6 py-8">
         {/* Game Stats */}
-        <div className="flex justify-between items-center mb-6 bg-gray-50 rounded-lg p-3">
+        <div className="flex justify-between items-center mb-8">
           <div className="text-center">
-            <div className="text-lg font-semibold text-gray-900">{moves}</div>
-            <div className="text-xs text-gray-500">MOVES</div>
+            <div className="text-lg font-bold text-black">{moves}</div>
+            <div className="text-xs text-gray-600">MOVES</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-semibold text-gray-900">{solvedWords.size}/5</div>
-            <div className="text-xs text-gray-500">WORDS FOUND</div>
+            <div className="text-lg font-bold text-black">{solvedWords.size}/5</div>
+            <div className="text-xs text-gray-600">WORDS FOUND</div>
           </div>
           <button
             onClick={initializeGame}
-            className="px-3 py-1 bg-gray-900 text-white rounded text-sm hover:bg-gray-700 transition-colors"
+            className="px-4 py-2 bg-white text-black rounded-full border border-black hover:bg-gray-50 transition-all font-semibold text-sm"
           >
-            NEW GAME
+            New Game
           </button>
         </div>
 
         {/* Game Board */}
-        <div className="relative mb-6">
+        <div className="relative mb-8">
           {/* Column flip buttons (top) */}
           {selectedCell && selectionMode === 'col' && (
-            <div className="flex justify-center mb-2">
+            <div className="flex justify-center mb-3">
               <button
                 onClick={handleFlip}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition-colors font-medium"
+                className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-all"
+                aria-label="Flip column"
               >
-                ↕ FLIP COLUMN
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 3v18M5 7l7-7 7 7M5 17l7 7 7-7" />
+                </svg>
               </button>
             </div>
           )}
 
-          <div className="grid gap-1 bg-gray-200 p-2 rounded-lg">
+          <div className="grid gap-2">
             {currentBoard.map((row, rowIndex) => (
-              <div key={rowIndex} className="flex gap-1 relative">
-                {/* Row flip button (left) */}
+              <div key={rowIndex} className="flex gap-2 relative justify-center">
+                {/* Row flip button (left) - positioned extremely close to prevent going out of view */}
                 {selectedCell && selectionMode === 'row' && selectedCell.startsWith(`${rowIndex},`) && (
                   <button
                     onClick={handleFlip}
-                    className="absolute -left-20 top-1/2 transform -translate-y-1/2 px-3 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition-colors font-medium text-sm"
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-all -ml-1"
+                    aria-label="Flip row"
                   >
-                    ↔ FLIP
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 12h18M7 5l-4 7 4 7M17 19l4-7-4-7" />
+                    </svg>
                   </button>
                 )}
 
@@ -278,17 +343,17 @@ export default function TenetGame() {
                       onClick={() => handleCellClick(rowIndex, colIndex)}
                       disabled={gameStatus !== 'playing'}
                       className={`
-                        w-12 h-12 flex items-center justify-center text-lg font-bold rounded
+                        w-14 h-14 flex items-center justify-center text-xl font-bold rounded-lg border
                         transition-all duration-200 transform hover:scale-105
                         ${isFixed 
-                          ? 'bg-amber-100 border-2 border-amber-400 text-amber-800' 
+                          ? 'bg-red-400 border-black text-black' 
                           : isHighlighted
                             ? selectionMode === 'row'
-                              ? 'bg-blue-100 border-2 border-blue-400 text-blue-800'
-                              : 'bg-green-100 border-2 border-green-400 text-green-800'
-                            : 'bg-white border-2 border-gray-300 text-gray-900'
+                              ? 'bg-blue-300 border-blue-400 text-black'
+                              : 'bg-blue-300 border-blue-400 text-black'
+                            : 'bg-white border-black text-black'
                         }
-                        ${isSelected ? 'ring-2 ring-offset-1 ring-purple-400' : ''}
+                        ${isSelected ? 'ring-2 ring-offset-2 ring-purple-400' : ''}
                         ${gameStatus !== 'playing' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:shadow-md'}
                       `}
                     >
@@ -302,60 +367,34 @@ export default function TenetGame() {
 
           {/* Column flip buttons (bottom) */}
           {selectedCell && selectionMode === 'col' && (
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center mt-3">
               <button
                 onClick={handleFlip}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition-colors font-medium"
+                className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center hover:bg-gray-800 transition-all"
+                aria-label="Flip column"
               >
-                ↕ FLIP COLUMN
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 3v18M5 7l7-7 7 7M5 17l7 7 7-7" />
+                </svg>
               </button>
             </div>
           )}
         </div>
 
-        {/* Instructions */}
-        {gameStatus === 'playing' && (
-          <div className="bg-blue-50 rounded-lg p-4 mb-4">
-            <h3 className="font-semibold text-blue-900 mb-2">How to play:</h3>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>• Click a cell to select its row (blue highlight)</li>
-              <li>• Click again to select its column (green highlight)</li>
-              <li>• Use flip buttons to reverse rows or columns</li>
-              <li>• 🟡 Fixed positions stay in place when flipping</li>
-              <li>• Goal: Restore original words or find all 5 words</li>
-            </ul>
-          </div>
-        )}
-
-        {/* Found Words */}
+        {/* Words Found Section - underneath game grid, no background box */}
         {solvedWords.size > 0 && (
-          <div className="bg-green-50 rounded-lg p-4 mb-4">
-            <h3 className="font-semibold text-green-900 mb-2">Words Found ({solvedWords.size}/5):</h3>
-            <div className="flex flex-wrap gap-2">
+          <div className="mb-8 text-center">
+            <h3 className="font-bold text-black mb-3">Words Found ({solvedWords.size}/5):</h3>
+            <div className="flex flex-wrap justify-center gap-2">
               {Array.from(solvedWords).sort().map(word => (
-                <span key={word} className="px-2 py-1 bg-green-200 text-green-800 rounded text-sm font-medium">
+                <span key={word} className="px-3 py-1 bg-gray-100 border border-gray-300 text-black rounded text-sm font-medium">
                   {word}
                 </span>
               ))}
             </div>
           </div>
         )}
-
-        {/* Win Messages */}
-        {gameStatus === 'perfect' && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-            <h2 className="text-xl font-bold text-yellow-800 mb-2">🎉 Perfect Solution!</h2>
-            <p className="text-yellow-700">You restored the board to its original state!</p>
-          </div>
-        )}
-
-        {gameStatus === 'all_words' && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-            <h2 className="text-xl font-bold text-green-800 mb-2">🎉 Well Done!</h2>
-            <p className="text-green-700">You found all the original words!</p>
-          </div>
-        )}
-      </div>
+      </main>
     </div>
   );
 }
