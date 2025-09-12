@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Rubik } from 'next/font/google';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -15,6 +15,26 @@ const rubik = Rubik({
 const yuseiMagic = {
   fontFamily: 'Yusei Magic',
 };
+
+// DEFAULT LOGO SIZES (used if individual game doesn't specify)
+const DEFAULT_TWO_TILE_LOGO_SIZE = 40;
+const DEFAULT_FULL_TILE_LOGO_SIZE = 60;
+
+interface GameOption {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: string;
+  color: string;
+  href: string;
+  logoSize?: number;
+}
+
+interface LayoutRow {
+  type: 'two-tiles' | 'full-tile';
+  games: GameOption[];
+  widerOnLeft?: boolean;
+}
 
 export default function Home() {
   const [greeting, setGreeting] = useState('Good Morning');
@@ -36,97 +56,190 @@ export default function Home() {
     };
 
     updateGreeting();
-    // Update greeting every minute
     const interval = setInterval(updateGreeting, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Image dimensions (you can adjust these)
+  // Image dimensions
   const timeIconWidth = 100;
   const timeIconHeight = 100;
   
   // Placeholder paths for time-based images
   const timeBasedImagePath = isEvening ? '/icons/night.svg' : '/icons/day.svg';
 
-  const gameOptions = [
+  const gameOptions: GameOption[] = [
     {
       id: 'miniesque',
       title: 'Mini-esque',
       subtitle: 'Almost a mini.',
       icon: '/icons/miniesque.svg',
-      href: '/minieque-fg'
+      color: 'bg-[#40FF4D]',
+      href: '/minieque-fg',
+      logoSize: 72
     },
     {
       id: 'connections',
       title: 'Connections',
       subtitle: 'Play the classic game.',
       icon: '/icons/connections.svg',
-      href: '/connections-fg'
+      color: 'bg-[#FFB1E2]',
+      href: '/connections-fg',
+      logoSize: 62
     },
     {
       id: 'archives',
       title: 'Archives',
       subtitle: 'Play Mini NYT archives',
       icon: '/icons/archives.svg',
-      href: 'https://thecodeworks.in/coreTries/exolve-player2.html'
-    },
-    {
-      id: 'punchline',
-      title: 'Punchline',
-      subtitle: 'Not a game actually.',
-      icon: '/icons/punchline.svg',
-      href: '/punchline-fg'
+      color: 'bg-[#B5DCFF]',
+      href: 'https://thecodeworks.in/coreTries/exolve-player2.html  ',
+      logoSize: 42
     },
     {
       id: 'sudokuction',
       title: 'Sudokuction',
       subtitle: 'Jigsaw and Sudoku.',
       icon: '/icons/sudokuction.svg',
-      href: '/sudokuction-fg'
+      color: 'bg-[#FF3333]',
+      href: '/sudokuction-fg',
+      logoSize: 44
+    },
+    {
+      id: 'punchline',
+      title: 'Punchline',
+      subtitle: 'Not a game actually.',
+      icon: '/icons/punchline.svg',
+      color: 'bg-[#FFFC39]',
+      href: '/punchline-fg',
+      logoSize: 100
     },
     {
       id: 'trivia',
       title: 'Trivia',
       subtitle: 'Easy and Medium modes',
-      icon: '/icons/trivia (1).svg',
-      href: 'https://thecodeworks.in/coreTries/trivia.html'
+      icon: '/icons/trivia2.svg',
+      color: 'bg-[#54E600]',
+      href: 'https://thecodeworks.in/coreTries/trivia.html  ',
+      logoSize: 64
     },
     {
       id: 'tenet',
       title: 'Tenet',
-      subtitle: 'Find all words through flips',
+      subtitle: 'Word Flips',
       icon: '/icons/tnt.svg',
-      href: '/tenetw'
-    },
-    {
-      id: 'shuffle',
-      title: 'Shuffle',
-      subtitle: 'Lock all pairs in this memory',
-      icon: '/icons/shf.svg',
-      href: 'https://thecodeworks.in/coreTries/shuffle.html'
+      color: 'bg-[#B5DCFF]',
+      href: '/tenetw',
+      logoSize: 62
     },
     {
       id: 'wordual',
       title: 'Wordual',
-      subtitle: 'A two player twist on Wordle!',
+      subtitle: 'Two player Wordle!',
       icon: '/icons/wd.svg',
-      href: 'https://wordual.onrender.com'
+      color: 'bg-[#FFD21F]',
+      href: 'https://wordual.onrender.com/',
+      logoSize: 40
     },
     {
-      id: 'six degrees',
+      id: 'shuffle',
+      title: 'Shuffle',
+      subtitle: 'Lock all pairs in memory',
+      icon: '/icons/shf.svg',
+      color: 'bg-[#FFB1E2]',
+      href: 'https://thecodeworks.in/coreTries/shuffle.html  ',
+      logoSize: 42
+    },
+    {
+      id: 'six-degrees',
       title: 'Six Degrees',
       subtitle: 'The Connections Pt II',
       icon: '/icons/sd.svg',
-      href: '/sixdegrees'
+      color: 'bg-[#69FFE8]',
+      href: '/sixdegrees',
+      logoSize: 72
     },
     {
       id: 'wikisprint',
       title: 'Wikisprint',
-      subtitle: 'Hop from link to link to get to the goal',
-      icon: '/icons/ws.svg',
-      href: 'https://wikisprint.vercel.app/'
+      subtitle: 'Link Travel',
+      icon: '/icons/wiki2.svg',
+      color: 'bg-[#D8D8D8]',
+      href: 'https://wikisprint.vercel.app/  ',
+      logoSize: 72
+    },
+    {
+      id: 'big-lecrossski',
+      title: 'The Big Lecrosski',
+      subtitle: 'The Full Crossword',
+      icon: '/icons/tfc.svg',
+      color: 'bg-[#FFBEE7]',
+      href: 'https://thecodeworks.in/coreTries/exolve-player3.html',
+      logoSize: 44
+    },
+    {
+      id: 'hopscotch',
+      title: 'Hopscotch',
+      subtitle: 'Numbers game',
+      icon: '/icons/hopscotch.svg',
+      color: 'bg-[#B5DCFF]',
+      href: 'https://thecodeworks.in/coreTries/hopscotch.html',
+      logoSize: 70
+    },
+    {
+      id: 'charades',
+      title: 'Charades',
+      subtitle: 'Cryptic with a twist',
+      icon: '/icons/charades1.svg',
+      color: 'bg-[#76C985]',
+      href: 'https://thecodeworks.in/coreTries/cryptic.html',
+      logoSize: 72
+    },
+    {
+      id: 'cipher',
+      title: 'Cipher',
+      subtitle: 'Decipher the code',
+      icon: '/icons/cipher.svg',
+      color: 'bg-[#CACCAF]',
+      href: 'https://thecodeworks.in/coreTries/cipher.html',
+      logoSize: 42
+    },
+    {
+      id: 'whispers',
+      title: 'Whispers',
+      subtitle: 'Text Transformations',
+      icon: '/icons/whispers.svg',
+      color: 'bg-[#2698FF]',
+      href: '/whispers',
+      logoSize: 60
     },
   ];
+
+  // Create alternating layout: odd rows have 2 tiles, even rows have 1 full tile
+  const layoutRows: LayoutRow[] = [];
+  let gameIndex = 0;
+
+  while (gameIndex < gameOptions.length) {
+    const currentRowIndex: number = layoutRows.length;
+    const isOddRow: boolean = currentRowIndex % 2 === 0;
+    
+    if (isOddRow && gameIndex + 1 < gameOptions.length) {
+      // Two tiles row - alternate which side the wider tile is on
+      const isWiderOnLeft: boolean = Math.floor(currentRowIndex / 2) % 2 === 0;
+      layoutRows.push({
+        type: 'two-tiles',
+        games: [gameOptions[gameIndex], gameOptions[gameIndex + 1]],
+        widerOnLeft: isWiderOnLeft
+      });
+      gameIndex += 2;
+    } else {
+      // Single full tile row
+      layoutRows.push({
+        type: 'full-tile',
+        games: [gameOptions[gameIndex]]
+      });
+      gameIndex += 1;
+    }
+  }
 
   return (
     <>
@@ -137,7 +250,7 @@ export default function Home() {
         <div className="max-w-md mx-auto px-4 py-8">
           {/* Header */}
           <div className="text-center mb-8">
-            {/* Time-based SVG Icon */}
+            {/* Time-based SVG Icon — kept as-is */}
             <div className="flex justify-center mb-4">
               <Image
                 src={timeBasedImagePath}
@@ -152,46 +265,224 @@ export default function Home() {
               {greeting}
             </h1>
             <p className="text-gray-600 text-sm">
-              Choose from our large selection of games & puzzles.
+              Play Unlimited.
             </p>
           </div>
 
-          {/* Game Grid */}
+          {/* Game Grid - Alternating layout */}
           <div className="space-y-3">
-            {gameOptions.map((game) => (
-              <Link
-                key={game.id}
-                href={game.href}
-                className="block w-full"
-              >
-                <div className="bg-white rounded-lg p-4 border border-gray-400 hover:shadow-sm transition-shadow duration-200 cursor-pointer">
-                  <div className="flex items-center space-x-4">
-                    {/* Icon */}
-                    <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
-                      <Image
-                        src={game.icon}
-                        alt={`${game.title} icon`}
-                        width={70}
-                        height={70}
-                        className="w-12 h-12 object-contain"
-                      />
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <h3 
-                        className="text-lg font-normal text-gray-900 truncate mb-1"
-                        style={yuseiMagic}
-                      >
-                        {game.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 truncate">
-                        {game.subtitle}
-                      </p>
-                    </div>
+            {layoutRows.map((row, rowIndex) => (
+              <div key={rowIndex}>
+                {row.type === 'two-tiles' ? (
+                  // Two tiles row
+                  <div className="flex space-x-3">
+                    {row.widerOnLeft ? (
+                      <>
+                        {/* Wider tile on left */}
+                        <Link
+                          href={row.games[0].href}
+                          className="flex-1"
+                          style={{ flexBasis: '65%' }}
+                        >
+                          <div className={`rounded-sm p-4 border border-black hover:shadow-sm transition-shadow duration-200 cursor-pointer ${row.games[0].color} h-36`}>
+                            <div className="flex flex-col items-center justify-start h-full space-y-2 pt-3">
+                              {/* LOGO CENTERED */}
+                              <div
+                                className="flex items-center justify-center"
+                                style={{
+                                  width: `${row.games[0].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
+                                  height: `${row.games[0].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
+                                }}
+                              >
+                                <div className="relative w-full h-full">
+                                  <Image
+                                    src={row.games[0].icon}
+                                    alt={`${row.games[0].title} icon`}
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
+                              </div>
+                              {/* TEXT LEFT ALIGNED UNDERNEATH */}
+                              <div className="text-left w-full px-2">
+                                <h3 
+                                  className="text-lg font-normal text-black truncate mb-1"
+                                  style={yuseiMagic}
+                                >
+                                  {row.games[0].title}
+                                </h3>
+                                <p className="text-sm text-black truncate opacity-90">
+                                  {row.games[0].subtitle}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                        {/* Smaller tile on right */}
+                        <Link
+                          href={row.games[1].href}
+                          className="flex-1"
+                          style={{ flexBasis: '35%' }}
+                        >
+                          <div className={`rounded-sm p-4 border border-black hover:shadow-sm transition-shadow duration-200 cursor-pointer ${row.games[1].color} h-36`}>
+                            <div className="flex flex-col items-center justify-start h-full space-y-2 pt-3">
+                              {/* LOGO CENTERED */}
+                              <div
+                                className="flex items-center justify-center"
+                                style={{
+                                  width: `${row.games[1].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
+                                  height: `${row.games[1].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
+                                }}
+                              >
+                                <div className="relative w-full h-full">
+                                  <Image
+                                    src={row.games[1].icon}
+                                    alt={`${row.games[1].title} icon`}
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
+                              </div>
+                              {/* TEXT LEFT ALIGNED UNDERNEATH */}
+                              <div className="text-left w-full px-2">
+                                <h3 
+                                  className="text-sm font-normal text-black truncate mb-1"
+                                  style={yuseiMagic}
+                                >
+                                  {row.games[1].title}
+                                </h3>
+                                <p className="text-xs text-black truncate opacity-90">
+                                  {row.games[1].subtitle}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        {/* Smaller tile on left */}
+                        <Link
+                          href={row.games[0].href}
+                          className="flex-1"
+                          style={{ flexBasis: '35%' }}
+                        >
+                          <div className={`rounded-sm p-4 border border-black hover:shadow-sm transition-shadow duration-200 cursor-pointer ${row.games[0].color} h-36`}>
+                            <div className="flex flex-col items-center justify-start h-full space-y-2 pt-3">
+                              {/* LOGO CENTERED */}
+                              <div
+                                className="flex items-center justify-center"
+                                style={{
+                                  width: `${row.games[0].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
+                                  height: `${row.games[0].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
+                                }}
+                              >
+                                <div className="relative w-full h-full">
+                                  <Image
+                                    src={row.games[0].icon}
+                                    alt={`${row.games[0].title} icon`}
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
+                              </div>
+                              {/* TEXT LEFT ALIGNED UNDERNEATH */}
+                              <div className="text-left w-full px-2">
+                                <h3 
+                                  className="text-sm font-normal text-black truncate mb-1"
+                                  style={yuseiMagic}
+                                >
+                                  {row.games[0].title}
+                                </h3>
+                                <p className="text-xs text-black truncate opacity-90">
+                                  {row.games[0].subtitle}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                        {/* Wider tile on right */}
+                        <Link
+                          href={row.games[1].href}
+                          className="flex-1"
+                          style={{ flexBasis: '65%' }}
+                        >
+                          <div className={`rounded-sm p-4 border border-black hover:shadow-sm transition-shadow duration-200 cursor-pointer ${row.games[1].color} h-36`}>
+                            <div className="flex flex-col items-center justify-start h-full space-y-2 pt-3">
+                              {/* LOGO CENTERED */}
+                              <div
+                                className="flex items-center justify-center"
+                                style={{
+                                  width: `${row.games[1].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
+                                  height: `${row.games[1].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
+                                }}
+                              >
+                                <div className="relative w-full h-full">
+                                  <Image
+                                    src={row.games[1].icon}
+                                    alt={`${row.games[1].title} icon`}
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
+                              </div>
+                              {/* TEXT LEFT ALIGNED UNDERNEATH */}
+                              <div className="text-left w-full px-2">
+                                <h3 
+                                  className="text-lg font-normal text-black truncate mb-1"
+                                  style={yuseiMagic}
+                                >
+                                  {row.games[1].title}
+                                </h3>
+                                <p className="text-sm text-black truncate opacity-90">
+                                  {row.games[1].subtitle}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      </>
+                    )}
                   </div>
-                </div>
-              </Link>
+                ) : (
+                  // Full width single tile
+                  <Link
+                    href={row.games[0].href}
+                  >
+                    <div className={`rounded-sm p-4 border border-black hover:shadow-sm transition-shadow duration-200 cursor-pointer ${row.games[0].color} h-20`}>
+                      <div className="flex items-center space-x-4 h-full">
+                        <div
+                          className="flex items-center justify-center flex-shrink-0"
+                          style={{
+                            width: `${row.games[0].logoSize || DEFAULT_FULL_TILE_LOGO_SIZE}px`,
+                            height: `${row.games[0].logoSize || DEFAULT_FULL_TILE_LOGO_SIZE}px`,
+                          }}
+                        >
+                          <div className="relative w-full h-full">
+                            <Image
+                              src={row.games[0].icon}
+                              alt={`${row.games[0].title} icon`}
+                              fill
+                              className="object-contain"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 
+                            className="text-xl font-normal text-black truncate mb-1"
+                            style={yuseiMagic}
+                          >
+                            {row.games[0].title}
+                          </h3>
+                          <p className="text-sm text-black truncate opacity-90">
+                            {row.games[0].subtitle}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                )}
+              </div>
             ))}
           </div>
         </div>
