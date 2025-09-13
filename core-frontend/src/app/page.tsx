@@ -1,492 +1,229 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Rubik } from 'next/font/google';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
-const rubik = Rubik({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-rubik',
-});
+// Array of profile image paths (relative to public folder)
+const profileImages = [
+  '/profiles/1.svg',
+  '/profiles/2.svg',
+  '/profiles/3.svg',
+];
 
-// Add Yusei Magic font
-const yuseiMagic = {
-  fontFamily: 'Yusei Magic',
-};
+export default function AuthPage() {
+  const [isLogin, setIsLogin] = useState(true);
+  const [username, setUsername] = useState('');
+  const [dob, setDob] = useState('');
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const router = useRouter();
 
-// DEFAULT LOGO SIZES (used if individual game doesn't specify)
-const DEFAULT_TWO_TILE_LOGO_SIZE = 40;
-const DEFAULT_FULL_TILE_LOGO_SIZE = 60;
-
-interface GameOption {
-  id: string;
-  title: string;
-  subtitle: string;
-  icon: string;
-  color: string;
-  href: string;
-  logoSize?: number;
-}
-
-interface LayoutRow {
-  type: 'two-tiles' | 'full-tile';
-  games: GameOption[];
-  widerOnLeft?: boolean;
-}
-
-export default function Home() {
-  const [greeting, setGreeting] = useState('Good Morning');
-  const [isEvening, setIsEvening] = useState(false);
-
+  // Check if user is already logged in
   useEffect(() => {
-    const updateGreeting = () => {
-      const hour = new Date().getHours();
-      if (hour < 12) {
-        setGreeting('Good Morning');
-        setIsEvening(false);
-      } else if (hour < 18) {
-        setGreeting('Good Afternoon');
-        setIsEvening(false);
-      } else {
-        setGreeting('Good Evening');
-        setIsEvening(true);
-      }
-    };
-
-    updateGreeting();
-    const interval = setInterval(updateGreeting, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Image dimensions
-  const timeIconWidth = 100;
-  const timeIconHeight = 100;
-  
-  // Placeholder paths for time-based images
-  const timeBasedImagePath = isEvening ? '/icons/night.svg' : '/icons/day.svg';
-
-  const gameOptions: GameOption[] = [
-    {
-      id: 'miniesque',
-      title: 'Mini-esque',
-      subtitle: 'Almost a mini.',
-      icon: '/icons/miniesque.svg',
-      color: 'bg-[#40FF4D]',
-      href: '/minieque-fg',
-      logoSize: 72
-    },
-    {
-      id: 'connections',
-      title: 'Connections',
-      subtitle: 'Play the classic game.',
-      icon: '/icons/connections.svg',
-      color: 'bg-[#FFB1E2]',
-      href: '/connections-fg',
-      logoSize: 62
-    },
-    {
-      id: 'archives',
-      title: 'Archives',
-      subtitle: 'Play Mini NYT archives',
-      icon: '/icons/archives.svg',
-      color: 'bg-[#B5DCFF]',
-      href: 'https://thecodeworks.in/coreTries/exolve-player2.html  ',
-      logoSize: 42
-    },
-    {
-      id: 'sudokuction',
-      title: 'Sudokuction',
-      subtitle: 'Jigsaw and Sudoku.',
-      icon: '/icons/sudokuction.svg',
-      color: 'bg-[#FF3333]',
-      href: '/sudokuction-fg',
-      logoSize: 44
-    },
-    {
-      id: 'punchline',
-      title: 'Punchline',
-      subtitle: 'Not a game actually.',
-      icon: '/icons/punchline.svg',
-      color: 'bg-[#FFFC39]',
-      href: '/punchline-fg',
-      logoSize: 100
-    },
-    {
-      id: 'trivia',
-      title: 'Trivia',
-      subtitle: 'Easy and Medium modes',
-      icon: '/icons/trivia2.svg',
-      color: 'bg-[#54E600]',
-      href: 'https://thecodeworks.in/coreTries/trivia.html  ',
-      logoSize: 64
-    },
-    {
-      id: 'tenet',
-      title: 'Tenet',
-      subtitle: 'Word Flips',
-      icon: '/icons/tnt.svg',
-      color: 'bg-[#B5DCFF]',
-      href: '/tenetw',
-      logoSize: 62
-    },
-    {
-      id: 'wordual',
-      title: 'Wordual',
-      subtitle: 'Two player Wordle!',
-      icon: '/icons/wd.svg',
-      color: 'bg-[#FFD21F]',
-      href: 'https://wordual.onrender.com/',
-      logoSize: 40
-    },
-    {
-      id: 'shuffle',
-      title: 'Shuffle',
-      subtitle: 'Lock all pairs in memory',
-      icon: '/icons/shf.svg',
-      color: 'bg-[#FFB1E2]',
-      href: 'https://thecodeworks.in/coreTries/shuffle.html  ',
-      logoSize: 42
-    },
-    {
-      id: 'six-degrees',
-      title: 'Six Degrees',
-      subtitle: 'The Connections Pt II',
-      icon: '/icons/sd.svg',
-      color: 'bg-[#69FFE8]',
-      href: '/sixdegrees',
-      logoSize: 72
-    },
-    {
-      id: 'wikisprint',
-      title: 'Wikisprint',
-      subtitle: 'Link Travel',
-      icon: '/icons/wiki2.svg',
-      color: 'bg-[#D8D8D8]',
-      href: 'https://wikisprint.vercel.app/  ',
-      logoSize: 72
-    },
-    {
-      id: 'big-lecrossski',
-      title: 'The Big Lecrosski',
-      subtitle: 'The Full Crossword',
-      icon: '/icons/tfc.svg',
-      color: 'bg-[#FFBEE7]',
-      href: 'https://thecodeworks.in/coreTries/exolve-player3.html',
-      logoSize: 44
-    },
-    {
-      id: 'hopscotch',
-      title: 'Hopscotch',
-      subtitle: 'Numbers game',
-      icon: '/icons/hopscotch.svg',
-      color: 'bg-[#B5DCFF]',
-      href: 'https://thecodeworks.in/coreTries/hopscotch.html',
-      logoSize: 70
-    },
-    {
-      id: 'charades',
-      title: 'Charades',
-      subtitle: 'Cryptic with a twist',
-      icon: '/icons/charades1.svg',
-      color: 'bg-[#76C985]',
-      href: 'https://thecodeworks.in/coreTries/cryptic.html',
-      logoSize: 72
-    },
-    {
-      id: 'cipher',
-      title: 'Cipher',
-      subtitle: 'Decipher the code',
-      icon: '/icons/cipher.svg',
-      color: 'bg-[#CACCAF]',
-      href: 'https://thecodeworks.in/coreTries/cipher.html',
-      logoSize: 42
-    },
-    {
-      id: 'whispers',
-      title: 'Whispers',
-      subtitle: 'Text Transformations',
-      icon: '/icons/whispers.svg',
-      color: 'bg-[#2698FF]',
-      href: '/whispers',
-      logoSize: 60
-    },
-  ];
-
-  // Create alternating layout: odd rows have 2 tiles, even rows have 1 full tile
-  const layoutRows: LayoutRow[] = [];
-  let gameIndex = 0;
-
-  while (gameIndex < gameOptions.length) {
-    const currentRowIndex: number = layoutRows.length;
-    const isOddRow: boolean = currentRowIndex % 2 === 0;
+    const token = localStorage.getItem('bento_token');
+    const username = localStorage.getItem('bento_username');
     
-    if (isOddRow && gameIndex + 1 < gameOptions.length) {
-      // Two tiles row - alternate which side the wider tile is on
-      const isWiderOnLeft: boolean = Math.floor(currentRowIndex / 2) % 2 === 0;
-      layoutRows.push({
-        type: 'two-tiles',
-        games: [gameOptions[gameIndex], gameOptions[gameIndex + 1]],
-        widerOnLeft: isWiderOnLeft
-      });
-      gameIndex += 2;
-    } else {
-      // Single full tile row
-      layoutRows.push({
-        type: 'full-tile',
-        games: [gameOptions[gameIndex]]
-      });
-      gameIndex += 1;
+    if (token && username) {
+      router.replace('/home'); // Use replace instead of push
     }
+    setIsCheckingAuth(false);
+  }, [router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const endpoint = isLogin ? '/login' : '/register';
+      const payload = isLogin 
+        ? { username, dob } 
+        : { username, dob, photo_index: photoIndex };
+      
+      const response = await fetch(`https://thecodeworks.in/core_backend${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store user info in localStorage
+        localStorage.setItem('bento_token', data.token);
+        localStorage.setItem('bento_username', data.username);
+        if (data.photo_index !== undefined) {
+          localStorage.setItem('bento_photo_index', data.photo_index.toString());
+        }
+        
+        // Redirect to home page using replace to prevent back navigation
+        router.replace('/home');
+      } else {
+        setError(data.error || 'Something went wrong');
+      }
+    } catch (err) {
+      setError('Failed to connect to server');
+      console.error('Auth error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // If user is already logged in and we're done checking auth, don't render anything
+  const token = typeof window !== 'undefined' ? localStorage.getItem('bento_token') : null;
+  const storedUsername = typeof window !== 'undefined' ? localStorage.getItem('bento_username') : null;
+  
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (token && storedUsername) {
+    return null; // Will redirect to /home
   }
 
   return (
-    <>
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap');
-      `}</style>
-      <div className={`min-h-screen bg-white ${rubik.variable} font-sans`}>
-        <div className="max-w-md mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            {/* Time-based SVG Icon — kept as-is */}
-            <div className="flex justify-center mb-4">
-              <Image
-                src={timeBasedImagePath}
-                alt={`${greeting} icon`}
-                width={timeIconWidth}
-                height={timeIconHeight}
-                className="object-contain"
-              />
-            </div>
-            
-            <h1 className="text-2xl font-medium text-gray-900 mb-2">
-              {greeting}
-            </h1>
-            <p className="text-gray-600 text-sm">
-              Play Unlimited.
-            </p>
-          </div>
-
-          {/* Game Grid - Alternating layout */}
-          <div className="space-y-3">
-            {layoutRows.map((row, rowIndex) => (
-              <div key={rowIndex}>
-                {row.type === 'two-tiles' ? (
-                  // Two tiles row
-                  <div className="flex space-x-3">
-                    {row.widerOnLeft ? (
-                      <>
-                        {/* Wider tile on left */}
-                        <Link
-                          href={row.games[0].href}
-                          className="flex-1"
-                          style={{ flexBasis: '65%' }}
-                        >
-                          <div className={`rounded-sm p-4 border border-black hover:shadow-sm transition-shadow duration-200 cursor-pointer ${row.games[0].color} h-36`}>
-                            <div className="flex flex-col items-center justify-start h-full space-y-2 pt-3">
-                              {/* LOGO CENTERED */}
-                              <div
-                                className="flex items-center justify-center"
-                                style={{
-                                  width: `${row.games[0].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
-                                  height: `${row.games[0].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
-                                }}
-                              >
-                                <div className="relative w-full h-full">
-                                  <Image
-                                    src={row.games[0].icon}
-                                    alt={`${row.games[0].title} icon`}
-                                    fill
-                                    className="object-contain"
-                                  />
-                                </div>
-                              </div>
-                              {/* TEXT LEFT ALIGNED UNDERNEATH */}
-                              <div className="text-left w-full px-2">
-                                <h3 
-                                  className="text-lg font-normal text-black truncate mb-1"
-                                  style={yuseiMagic}
-                                >
-                                  {row.games[0].title}
-                                </h3>
-                                <p className="text-sm text-black truncate opacity-90">
-                                  {row.games[0].subtitle}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                        {/* Smaller tile on right */}
-                        <Link
-                          href={row.games[1].href}
-                          className="flex-1"
-                          style={{ flexBasis: '35%' }}
-                        >
-                          <div className={`rounded-sm p-4 border border-black hover:shadow-sm transition-shadow duration-200 cursor-pointer ${row.games[1].color} h-36`}>
-                            <div className="flex flex-col items-center justify-start h-full space-y-2 pt-3">
-                              {/* LOGO CENTERED */}
-                              <div
-                                className="flex items-center justify-center"
-                                style={{
-                                  width: `${row.games[1].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
-                                  height: `${row.games[1].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
-                                }}
-                              >
-                                <div className="relative w-full h-full">
-                                  <Image
-                                    src={row.games[1].icon}
-                                    alt={`${row.games[1].title} icon`}
-                                    fill
-                                    className="object-contain"
-                                  />
-                                </div>
-                              </div>
-                              {/* TEXT LEFT ALIGNED UNDERNEATH */}
-                              <div className="text-left w-full px-2">
-                                <h3 
-                                  className="text-sm font-normal text-black truncate mb-1"
-                                  style={yuseiMagic}
-                                >
-                                  {row.games[1].title}
-                                </h3>
-                                <p className="text-xs text-black truncate opacity-90">
-                                  {row.games[1].subtitle}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                      </>
-                    ) : (
-                      <>
-                        {/* Smaller tile on left */}
-                        <Link
-                          href={row.games[0].href}
-                          className="flex-1"
-                          style={{ flexBasis: '35%' }}
-                        >
-                          <div className={`rounded-sm p-4 border border-black hover:shadow-sm transition-shadow duration-200 cursor-pointer ${row.games[0].color} h-36`}>
-                            <div className="flex flex-col items-center justify-start h-full space-y-2 pt-3">
-                              {/* LOGO CENTERED */}
-                              <div
-                                className="flex items-center justify-center"
-                                style={{
-                                  width: `${row.games[0].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
-                                  height: `${row.games[0].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
-                                }}
-                              >
-                                <div className="relative w-full h-full">
-                                  <Image
-                                    src={row.games[0].icon}
-                                    alt={`${row.games[0].title} icon`}
-                                    fill
-                                    className="object-contain"
-                                  />
-                                </div>
-                              </div>
-                              {/* TEXT LEFT ALIGNED UNDERNEATH */}
-                              <div className="text-left w-full px-2">
-                                <h3 
-                                  className="text-sm font-normal text-black truncate mb-1"
-                                  style={yuseiMagic}
-                                >
-                                  {row.games[0].title}
-                                </h3>
-                                <p className="text-xs text-black truncate opacity-90">
-                                  {row.games[0].subtitle}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                        {/* Wider tile on right */}
-                        <Link
-                          href={row.games[1].href}
-                          className="flex-1"
-                          style={{ flexBasis: '65%' }}
-                        >
-                          <div className={`rounded-sm p-4 border border-black hover:shadow-sm transition-shadow duration-200 cursor-pointer ${row.games[1].color} h-36`}>
-                            <div className="flex flex-col items-center justify-start h-full space-y-2 pt-3">
-                              {/* LOGO CENTERED */}
-                              <div
-                                className="flex items-center justify-center"
-                                style={{
-                                  width: `${row.games[1].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
-                                  height: `${row.games[1].logoSize || DEFAULT_TWO_TILE_LOGO_SIZE}px`,
-                                }}
-                              >
-                                <div className="relative w-full h-full">
-                                  <Image
-                                    src={row.games[1].icon}
-                                    alt={`${row.games[1].title} icon`}
-                                    fill
-                                    className="object-contain"
-                                  />
-                                </div>
-                              </div>
-                              {/* TEXT LEFT ALIGNED UNDERNEATH */}
-                              <div className="text-left w-full px-2">
-                                <h3 
-                                  className="text-lg font-normal text-black truncate mb-1"
-                                  style={yuseiMagic}
-                                >
-                                  {row.games[1].title}
-                                </h3>
-                                <p className="text-sm text-black truncate opacity-90">
-                                  {row.games[1].subtitle}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  // Full width single tile
-                  <Link
-                    href={row.games[0].href}
-                  >
-                    <div className={`rounded-sm p-4 border border-black hover:shadow-sm transition-shadow duration-200 cursor-pointer ${row.games[0].color} h-20`}>
-                      <div className="flex items-center space-x-4 h-full">
-                        <div
-                          className="flex items-center justify-center flex-shrink-0"
-                          style={{
-                            width: `${row.games[0].logoSize || DEFAULT_FULL_TILE_LOGO_SIZE}px`,
-                            height: `${row.games[0].logoSize || DEFAULT_FULL_TILE_LOGO_SIZE}px`,
-                          }}
-                        >
-                          <div className="relative w-full h-full">
-                            <Image
-                              src={row.games[0].icon}
-                              alt={`${row.games[0].title} icon`}
-                              fill
-                              className="object-contain"
-                            />
-                          </div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 
-                            className="text-xl font-normal text-black truncate mb-1"
-                            style={yuseiMagic}
-                          >
-                            {row.games[0].title}
-                          </h3>
-                          <p className="text-sm text-black truncate opacity-90">
-                            {row.games[0].subtitle}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                )}
-              </div>
-            ))}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
+          Welcome to Bento Games
+        </h1>
+        
+        <div className="flex justify-center mb-6">
+          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+            <button
+              type="button"
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                isLogin 
+                  ? 'bg-white text-blue-600 shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+              onClick={() => setIsLogin(true)}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                !isLogin 
+                  ? 'bg-white text-blue-600 shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+              onClick={() => setIsLogin(false)}
+            >
+              Sign Up
+            </button>
           </div>
         </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="dob" className="block text-sm font-medium text-gray-700 mb-1">
+              Date of Birth
+            </label>
+            <input
+              id="dob"
+              type="date"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          {!isLogin && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Profile Photo
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                {profileImages.map((imagePath, index) => (
+                  <div
+                    key={index}
+                    className={`relative w-20 h-20 rounded-full overflow-hidden cursor-pointer border-2 transition-all ${
+                      photoIndex === index 
+                        ? 'border-blue-500 ring-2 ring-blue-200 scale-105' 
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    onClick={() => setPhotoIndex(index)}
+                  >
+                    <Image
+                      src={imagePath}
+                      alt={`Profile ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
+                    {photoIndex === index && (
+                      <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                Selected: Profile {photoIndex + 1}
+              </p>
+            </div>
+          )}
+
+          {error && (
+            <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Sign Up'}
+          </button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-gray-600">
+          {isLogin ? "Don't have an account? " : "Already have an account? "}
+          <button
+            type="button"
+            className="text-blue-600 hover:text-blue-800 font-medium"
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setError('');
+            }}
+          >
+            {isLogin ? 'Sign up' : 'Sign in'}
+          </button>
+        </p>
       </div>
-    </>
+    </div>
   );
 }
