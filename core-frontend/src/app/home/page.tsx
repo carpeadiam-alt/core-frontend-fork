@@ -39,6 +39,7 @@ interface LayoutRow {
 export default function Home() {
   const [greeting, setGreeting] = useState('Good Morning');
   const [isEvening, setIsEvening] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     const updateGreeting = () => {
@@ -55,6 +56,12 @@ export default function Home() {
       }
     };
 
+    // Get token from localStorage on component mount
+    if (typeof window !== 'undefined') {
+      const storedToken = localStorage.getItem('bento_token');
+      setToken(storedToken);
+    }
+
     updateGreeting();
     const interval = setInterval(updateGreeting, 60000);
     return () => clearInterval(interval);
@@ -66,6 +73,16 @@ export default function Home() {
   
   // Placeholder paths for time-based images
   const timeBasedImagePath = isEvening ? '/icons/night.svg' : '/icons/day.svg';
+
+  // Function to generate URLs with token parameter for external links
+  const getGameUrl = (baseUrl: string) => {
+    if (token && (baseUrl.includes('thecodeworks.in') || baseUrl.includes('wordual.onrender.com') || baseUrl.includes('wikisprint.vercel.app'))) {
+      // Add token parameter to external URLs
+      const separator = baseUrl.includes('?') ? '&' : '?';
+      return `${baseUrl}${separator}token=${encodeURIComponent(token)}`;
+    }
+    return baseUrl;
+  };
 
   const gameOptions: GameOption[] = [
     {
@@ -92,7 +109,7 @@ export default function Home() {
       subtitle: 'Play Mini NYT archives',
       icon: '/icons/archives.svg',
       color: 'bg-[#B5DCFF]',
-      href: 'https://thecodeworks.in/coreTries/exolve-player2.html  ',
+      href: getGameUrl('https://thecodeworks.in/coreTries/exolve-player2.html'),
       logoSize: 42
     },
     {
@@ -119,7 +136,7 @@ export default function Home() {
       subtitle: 'Easy and Medium modes',
       icon: '/icons/trivia2.svg',
       color: 'bg-[#54E600]',
-      href: 'https://thecodeworks.in/coreTries/trivia.html  ',
+      href: getGameUrl('https://thecodeworks.in/coreTries/trivia.html'),
       logoSize: 64
     },
     {
@@ -146,7 +163,7 @@ export default function Home() {
       subtitle: 'Lock all pairs in memory',
       icon: '/icons/shf.svg',
       color: 'bg-[#FFB1E2]',
-      href: 'https://thecodeworks.in/coreTries/shuffle.html  ',
+      href: getGameUrl('https://thecodeworks.in/coreTries/shuffle.html'),
       logoSize: 42
     },
     {
@@ -164,7 +181,7 @@ export default function Home() {
       subtitle: 'Link Travel',
       icon: '/icons/wiki2.svg',
       color: 'bg-[#D8D8D8]',
-      href: 'https://wikisprint.vercel.app/  ',
+      href: 'https://wikisprint.vercel.app/',
       logoSize: 72
     },
     {
@@ -173,7 +190,7 @@ export default function Home() {
       subtitle: 'The Full Crossword',
       icon: '/icons/tfc.svg',
       color: 'bg-[#FFBEE7]',
-      href: 'https://thecodeworks.in/coreTries/exolve-player3.html',
+      href: getGameUrl('https://thecodeworks.in/coreTries/exolve-player3.html'),
       logoSize: 44
     },
     {
@@ -182,7 +199,7 @@ export default function Home() {
       subtitle: 'Numbers game',
       icon: '/icons/hopscotch.svg',
       color: 'bg-[#B5DCFF]',
-      href: 'https://thecodeworks.in/coreTries/hopscotch.html',
+      href: getGameUrl('https://thecodeworks.in/coreTries/hopscotch.html'),
       logoSize: 70
     },
     {
@@ -191,7 +208,7 @@ export default function Home() {
       subtitle: 'Cryptic with a twist',
       icon: '/icons/charades1.svg',
       color: 'bg-[#76C985]',
-      href: 'https://thecodeworks.in/coreTries/cryptic.html',
+      href: getGameUrl('https://thecodeworks.in/coreTries/cryptic.html'),
       logoSize: 72
     },
     {
@@ -200,7 +217,7 @@ export default function Home() {
       subtitle: 'Decipher the code',
       icon: '/icons/cipher.svg',
       color: 'bg-[#CACCAF]',
-      href: 'https://thecodeworks.in/coreTries/cipher.html',
+      href: getGameUrl('https://thecodeworks.in/coreTries/cipher.html'),
       logoSize: 42
     },
     {
