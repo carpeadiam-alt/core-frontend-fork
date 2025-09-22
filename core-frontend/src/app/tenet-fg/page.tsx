@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Rubik, Yusei_Magic } from 'next/font/google';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,24 +17,27 @@ const yuseiMagic = Yusei_Magic({
 });
 
 // Controllable parameters for logo SVG
-const logoSize = 64;
-const logoPath = '/icons/trivia-w.svg';
+const logoSize = 64; // Size of the logo
+const logoPath = "/icons/tenet-w.svg"; // Path to your logo SVG file
 
-// Controllable parameters for button links
-const easyHref = 'https://thecodeworks.in/coreTries/trivia2.html';
-const mediumHref = 'https://thecodeworks.in/coreTries/trivia.html';
+// Controllable parameters for button link
+const buttonHref = "/tenetw"; // Change this to your desired link (internal: "/page" or external: "https://example.com")
+const buttonText = "Play"; // Button text
 
 export default function Page() {
   // Controllable parameters for SVG illustration
-  const svgWidth = 600;
-  const svgHeight = 650;
-  const svgScaleFactor = 0.8;
-  const bottomOffset = -200;
-  const svgPath = '/fores/t-fg.svg';
-
+  const svgWidth = 700; // Base width of the SVG
+  const svgHeight = 450; // Base height of the SVG
+  const svgScaleFactor = 1.1; // Scale factor (1.0 = original size, 1.5 = 150%, 2.0 = 200%, etc.)
+  const bottomOffset = -175; // Height from bottom in pixels
+  const svgPath = "/fores/te-fg.svg"; // Path to your SVG file
+  
   // Calculate scaled dimensions
   const scaledWidth = svgWidth * svgScaleFactor;
   const scaledHeight = svgHeight * svgScaleFactor;
+  
+  // Check if the link is external
+  const isExternalLink = buttonHref.startsWith('http://') || buttonHref.startsWith('https://') || buttonHref.startsWith('//');
 
   const [token, setToken] = useState<string | null>(null);
 
@@ -60,13 +63,12 @@ export default function Page() {
     return baseUrl;
   };
 
+  
   return (
-    <div
-      className={`min-h-screen bg-[#4AC900] relative overflow-hidden ${rubik.variable} ${yuseiMagic.variable}`}
-    >
+    <div className={`min-h-screen bg-[#669BBC] relative overflow-hidden ${rubik.variable} ${yuseiMagic.variable}`}>
       {/* Main content container */}
-      <div className="flex flex-col items-center justify-start pt-20 px-2">
-        {/* Logo/Icon */}
+      <div className="flex flex-col items-center justify-start pt-20 px-8">
+        {/* Logo/Icon - Now using uploaded SVG */}
         <div className="mb-8">
           <Image
             src={logoPath}
@@ -77,49 +79,48 @@ export default function Page() {
             priority
           />
         </div>
-                <h1
+
+        {/* Title */}
+        <h1 
           className={`text-black text-4xl font-light mb-12 tracking-wide ${yuseiMagic.className}`}
         >
-          Trivia
+          Tenet
         </h1>
-        <div className="flex flex-col gap-4">
-          <a
-            href={getGameUrl(easyHref)}
-            className="bg-black text-white px-10 py-2 rounded-full text-lg font-medium shadow-lg inline-block text-center no-underline"
+
+        {/* Play Button */}
+        {isExternalLink ? (
+          <a 
+            href={getGameUrl(buttonHref)}
+            className="bg-black text-white px-12 py-2 rounded-full text-lg font-medium  shadow-lg inline-block text-center no-underline"
           >
-            Easy
+            {buttonText}
           </a>
-          <a
-            href={getGameUrl(mediumHref)}
-            className="bg-black text-white px-10 py-2 rounded-full text-lg font-medium shadow-lg inline-block text-center no-underline"
+        ) : (
+          <Link 
+            href={buttonHref}
+            className="bg-black text-white px-12 py-2 rounded-full text-lg font-medium shadow-lg inline-block text-center no-underline"
           >
-            Medium
-          </a>
-        </div>
+            {buttonText}
+          </Link>
+        )}
       </div>
-        {/* Title */}
 
-
-        {/* Buttons */}
-
-
-      {/* SVG Illustration */}
-      <div
+      {/* SVG Illustration - Fixed position with controllable size, scaling factor, and bottom offset */}
+      <div 
         className="fixed left-1/2 transform -translate-x-1/2 pointer-events-none"
-        style={{
+        style={{ 
           bottom: `${bottomOffset}px`,
           width: `${scaledWidth}px`,
-          height: `${scaledHeight}px`,
+          height: `${scaledHeight}px`
         }}
       >
-        <img
+        <Image
           src={svgPath}
           alt="Game illustration"
-          style={{
-            width: `${scaledWidth}px`,
-            height: `${scaledHeight}px`,
-            objectFit: 'contain',
-          }}
+          width={scaledWidth}
+          height={scaledHeight}
+          className="w-full h-full object-contain"
+          priority
         />
       </div>
     </div>
