@@ -109,7 +109,7 @@ export default function Home() {
       subtitle: 'Play Mini NYT archives',
       icon: '/icons/archives.svg',
       color: 'bg-[#B5DCFF]',
-      href: getGameUrl('https://thecodeworks.in/coreTries/exolve-player2.html'),
+      href: 'archives-fg',
       logoSize: 42
     },
     {

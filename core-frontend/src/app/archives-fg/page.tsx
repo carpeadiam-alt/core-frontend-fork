@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Rubik, Yusei_Magic } from 'next/font/google';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,28 +18,15 @@ const yuseiMagic = Yusei_Magic({
 });
 
 // Controllable parameters for logo SVG
-const logoSize = 64; // Size of the logo
-const logoPath = "/icons/sdw.svg"; // Path to your logo SVG file
+const logoSize = 64;
+const logoPath = '/icons/archives-w.svg';
 
 // Controllable parameters for button link
-const buttonHref = "https://thecodeworks.in/coreTries/s2.html"; // Change this to your desired link (internal: "/page" or external: "https://example.com")
-const buttonText = "Play"; // Button text
+const buttonHref = 'https://thecodeworks.in/coreTries/exolve-player2.html';
+const buttonText = 'Play';
 
 export default function Page() {
-  // Controllable parameters for SVG illustration
-  const svgWidth = 700; // Base width of the SVG
-  const svgHeight = 450; // Base height of the SVG
-  const svgScaleFactor = 1.25; // Scale factor (1.0 = original size, 1.5 = 150%, 2.0 = 200%, etc.)
-  const bottomOffset = -150; // Height from bottom in pixels
-  const svgPath = "/fores/sdfg.svg"; // Path to your SVG file
-  
-  // Calculate scaled dimensions
-  const scaledWidth = svgWidth * svgScaleFactor;
-  const scaledHeight = svgHeight * svgScaleFactor;
-  
-  // Check if the link is external
-  const isExternalLink = buttonHref.startsWith('http://') || buttonHref.startsWith('https://') || buttonHref.startsWith('//');
-
+  // Token state
   const [token, setToken] = useState<string | null>(null);
 
   // Load token from localStorage after mount
@@ -63,12 +51,25 @@ export default function Page() {
     return baseUrl;
   };
 
-  
+  // Detect external link
+  const isExternalLink =
+    buttonHref.startsWith('http://') ||
+    buttonHref.startsWith('https://') ||
+    buttonHref.startsWith('//');
+
+  // Controllable parameters for SVG illustration
+  const svgWidth = 600;
+  const svgHeight = 400;
+  const bottomOffset = -150;
+  const svgPath = '/fores/m1bg.svg';
+
   return (
-    <div className={`min-h-screen bg-[#D45633] relative overflow-hidden ${rubik.variable} ${yuseiMagic.variable}`}>
+    <div
+      className={`min-h-screen bg-[#2698FF] relative overflow-hidden ${rubik.variable} ${yuseiMagic.variable}`}
+    >
       {/* Main content container */}
       <div className="flex flex-col items-center justify-start pt-20 px-8">
-        {/* Logo/Icon - Now using uploaded SVG */}
+        {/* Logo */}
         <div className="mb-8">
           <Image
             src={logoPath}
@@ -81,44 +82,44 @@ export default function Page() {
         </div>
 
         {/* Title */}
-        <h1 
+        <h1
           className={`text-white text-4xl font-light mb-12 tracking-wide ${yuseiMagic.className}`}
         >
-          Sudokuction
+          Archives
         </h1>
 
         {/* Play Button */}
         {isExternalLink ? (
-          <a 
+          <a
             href={getGameUrl(buttonHref)}
-            className="bg-black text-white px-12 py-2 rounded-full text-lg font-medium  shadow-lg inline-block text-center no-underline"
+            className="bg-black text-white px-12 py-2 rounded-full text-lg font-medium shadow-lg inline-block text-center no-underline"
           >
             {buttonText}
           </a>
         ) : (
-          <Link 
-            href={buttonHref}
-            className="bg-black text-white px-12 py-2 rounded-full text-lg font-medium shadow-lg inline-block text-center no-underline"
+          <Link
+            href={getGameUrl(buttonHref)}
+            className="bg-black text-white px-12 py-2 rounded-full text-lg font-medium hover:bg-gray-800 transition-colors duration-200 shadow-lg inline-block text-center no-underline"
           >
             {buttonText}
           </Link>
         )}
       </div>
 
-      {/* SVG Illustration - Fixed position with controllable size, scaling factor, and bottom offset */}
-      <div 
+      {/* SVG Illustration */}
+      <div
         className="fixed left-1/2 transform -translate-x-1/2 pointer-events-none"
-        style={{ 
+        style={{
           bottom: `${bottomOffset}px`,
-          width: `${scaledWidth}px`,
-          height: `${scaledHeight}px`
+          width: `${svgWidth}px`,
+          height: `${svgHeight}px`,
         }}
       >
         <Image
           src={svgPath}
           alt="Game illustration"
-          width={scaledWidth}
-          height={scaledHeight}
+          width={svgWidth}
+          height={svgHeight}
           className="w-full h-full object-contain"
           priority
         />
