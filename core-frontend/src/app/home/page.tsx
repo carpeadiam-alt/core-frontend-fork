@@ -136,7 +136,7 @@ export default function Home() {
       subtitle: 'Easy and Medium modes',
       icon: '/icons/trivia2.svg',
       color: 'bg-[#54E600]',
-      href: getGameUrl('https://thecodeworks.in/coreTries/trivia.html'),
+      href: '/trivia-fg',
       logoSize: 64
     },
     {
