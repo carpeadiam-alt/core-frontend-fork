@@ -145,7 +145,7 @@ export default function Home() {
       subtitle: 'Word Flips',
       icon: '/icons/tnt.svg',
       color: 'bg-[#B5DCFF]',
-      href: '/tenetw',
+      href: '/tenet-fg',
       logoSize: 62
     },
     {
@@ -163,7 +163,7 @@ export default function Home() {
       subtitle: 'Lock all pairs in memory',
       icon: '/icons/shf.svg',
       color: 'bg-[#FFB1E2]',
-      href: getGameUrl('https://thecodeworks.in/coreTries/shuffle.html'),
+      href: '/shuffle-fg',
       logoSize: 42
     },
     {
