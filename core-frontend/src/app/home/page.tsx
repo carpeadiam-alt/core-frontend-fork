@@ -190,7 +190,7 @@ export default function Home() {
       subtitle: 'The Full Crossword',
       icon: '/icons/tfc.svg',
       color: 'bg-[#FFBEE7]',
-      href: getGameUrl('https://thecodeworks.in/coreTries/exolve-player3.html'),
+      href: '/bl-fg',
       logoSize: 44
     },
     {
