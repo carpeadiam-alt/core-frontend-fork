@@ -30,6 +30,32 @@ export default function Page() {
   const svgHeight = 400; // Height of the SVG
   const bottomOffset = -150; // Height from bottom in pixels
   const svgPath = "/fores/m1bg.svg"; // Path to your SVG file
+
+    // Token state
+  const [token, setToken] = useState<string | null>(null);
+
+  // Load token from localStorage after mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedToken = localStorage.getItem('bento_token');
+      setToken(storedToken);
+    }
+  }, []);
+
+  // Build URL with token if needed
+  const getGameUrl = (baseUrl: string) => {
+    if (
+      token &&
+      (baseUrl.includes('thecodeworks.in') ||
+        baseUrl.includes('wordual.onrender.com') ||
+        baseUrl.includes('wikisprint.vercel.app'))
+    ) {
+      const separator = baseUrl.includes('?') ? '&' : '?';
+      return `${baseUrl}${separator}token=${encodeURIComponent(token)}`;
+    }
+    return baseUrl;
+  };
+
   
   // Check if the link is external
   const isExternalLink = buttonHref.startsWith('http://') || buttonHref.startsWith('https://') || buttonHref.startsWith('//');
@@ -60,7 +86,7 @@ export default function Page() {
         {/* Play Button */}
         {isExternalLink ? (
           <a 
-            href={buttonHref}
+            href={getGameUrl(buttonHref)}
             className="bg-black text-white px-12 py-2 rounded-full text-lg font-medium  shadow-lg inline-block text-center no-underline"
           >
             {buttonText}

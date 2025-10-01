@@ -138,11 +138,37 @@ export default function ConnectionsGame() {
       setShowOneAway(false);
 
       // Check if game is won
-      if (newFoundCategories.length === 4) {
-        setGameStatus('won');
-        setMessage('Congratulations! You solved all categories!');
-        setShowGameComplete(true);
+if (newFoundCategories.length === 4) {
+  setGameStatus('won');
+  setMessage('Congratulations! You solved all categories!');
+  setShowGameComplete(true);
+
+  // Send score to backend
+  const token = typeof window !== 'undefined' ? localStorage.getItem('bento_token') : null;
+  if (token) {
+    fetch('https://thecodeworks.in/core_backend/update_score', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: token,
+        game: 'Connections',
+        score: 20,
+      }),
+    })
+    .then(response => {
+      if (!response.ok) {
+        console.warn('Failed to submit score:', response.statusText);
       }
+    })
+    .catch(error => {
+      console.error('Error submitting score:', error);
+    });
+  } else {
+    console.warn('No bento_token found in localStorage. Score not submitted.');
+  }
+}
     } else {
       // Wrong guess - check if one away
       let isOneAway = false;
