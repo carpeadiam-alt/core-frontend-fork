@@ -35,6 +35,8 @@ export default function Page() {
   // Calculate scaled dimensions
   const scaledWidth = svgWidth * svgScaleFactor;
   const scaledHeight = svgHeight * svgScaleFactor;
+
+  
   
   // Check if the link is external
   const isExternalLink = buttonHref.startsWith('http://') || buttonHref.startsWith('https://') || buttonHref.startsWith('//');
@@ -97,7 +99,7 @@ export default function Page() {
           </a>
         ) : (
           <Link 
-            href={buttonHref}
+            href={getGameUrl(buttonHref)}
             className="bg-black text-white px-12 py-2 rounded-full text-lg font-medium shadow-lg inline-block text-center no-underline"
           >
             {buttonText}
