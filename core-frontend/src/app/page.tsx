@@ -190,7 +190,7 @@ export default function AuthPage() {
                       alt={`Profile ${index + 1}`}
                       fill
                       className="object-cover"
-                      sizes="80px"
+                      sizes="70px"
                     />
                     {photoIndex === index && (
                       <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
