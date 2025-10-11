@@ -6,9 +6,22 @@ import Image from 'next/image';
 
 // Array of profile image paths (relative to public folder)
 const profileImages = [
+  '/profiles/0.svg',
   '/profiles/1.svg',
   '/profiles/2.svg',
   '/profiles/3.svg',
+   '/profiles/4.svg',
+  '/profiles/5.svg',
+  '/profiles/6.svg',
+  '/profiles/7.svg',
+  '/profiles/8.svg',
+  '/profiles/9.svg',
+  '/profiles/10.svg',
+  '/profiles/11.svg',
+  '/profiles/12.svg',
+  '/profiles/13.svg',
+  '/profiles/14.svg',
+  '/profiles/15.svg',
 ];
 
 export default function AuthPage() {
