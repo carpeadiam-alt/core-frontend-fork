@@ -77,7 +77,7 @@ export default function AuthPage() {
         ? { username, dob }
         : { username, dob, photo_index: photoIndex };
 
-      // 🔥 FIXED: Removed extra spaces in URL
+      // ✅ Fixed URL: no extra spaces
       const response = await fetch(`https://thecodeworks.in/core_backend${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -123,8 +123,8 @@ export default function AuthPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-white flex flex-col items-center pt-12 px-4 pb-24 ${rubik.variable} ${yuseiMagic.variable} relative`}>
-      {/* Main Content */}
+    <div className={`min-h-screen bg-white flex flex-col items-center pt-10 px-4 pb-28 relative ${rubik.variable} ${yuseiMagic.variable}`}>
+      {/* Logo */}
       <div className="mb-6">
         <Image
           src={LOGO_PATH}
@@ -132,7 +132,6 @@ export default function AuthPage() {
           width={80}
           height={80}
           priority
-          className="drop-shadow-none"
         />
       </div>
 
@@ -233,7 +232,7 @@ export default function AuthPage() {
           )}
 
           {error && (
-            <div className="p-3.5 bg-red-100/80 text-red-700 rounded-xl text-sm text-center border border-red-200">
+            <div className="p-3.5 bg-red-100 text-red-700 rounded-xl text-sm text-center border border-red-200">
               {error}
             </div>
           )}
@@ -248,24 +247,22 @@ export default function AuthPage() {
         </form>
       </div>
 
-      {/* Fixed Game Logo Ticker at Bottom */}
-{/* Fixed Game Logo Ticker at Bottom */}
-<div className="fixed bottom-0 left-0 right-0 h-[72px] bg-white/90 backdrop-blur-sm  flex items-center overflow-hidden z-10">
-  <div className="flex animate-scroll whitespace-nowrap px-4">
-    {[...gameLogos, ...gameLogos].map((logo, index) => (
-      <div key={index} className="mx-3 flex items-center justify-center h-full min-w-[56px]">
-        {/* Use plain <img> for reliable SVG rendering */}
-        <img
-          src={logo}
-          alt=""
-          aria-hidden="true"
-          className="h-[32px] w-auto max-w-[60px] object-contain"
-          loading="eager"
-        />
+ 
+      <div className="absolute bottom-0 left-0 right-0 h-[72px] bg-white/90 backdrop-blur-sm border-t border-gray-200 flex items-center overflow-hidden z-10">
+        <div className="flex animate-scroll whitespace-nowrap px-4">
+          {[...gameLogos, ...gameLogos].map((logo, index) => (
+            <div key={index} className="mx-3 flex items-center justify-center h-full min-w-[56px]">
+              <img
+                src={logo}
+                alt=""
+                aria-hidden="true"
+                className="h-[32px] w-auto max-w-[60px] object-contain"
+                loading="eager"
+              />
+            </div>
+          ))}
+        </div>
       </div>
-    ))}
-  </div>
-</div>
     </div>
   );
 }
