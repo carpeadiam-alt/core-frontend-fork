@@ -35,8 +35,17 @@ const profileImages = [
   '/profiles/14.svg',
 ];
 
+const gameLogos = [
+  '/icons/archives.svg',
+  '/icons/charades1.svg',
+  '/icons/cipher.svg',
+  '/icons/connections.svg',
+  '/icons/hopscotch.svg',
+  '/icons/miniesque.svg',
+  '/icons/punchline.svg',
+];
 
-const LOGO_PATH = '/icons/new_logo.svg'; 
+const LOGO_PATH = '/icons/new_logo.svg';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -68,7 +77,7 @@ export default function AuthPage() {
         ? { username, dob }
         : { username, dob, photo_index: photoIndex };
 
-      // Fixed URL (removed extra space)
+      // 🔥 FIXED: Removed extra spaces in URL
       const response = await fetch(`https://thecodeworks.in/core_backend${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -100,7 +109,7 @@ export default function AuthPage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F3FF48]">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent mx-auto"></div>
           <p className="mt-3 text-black font-medium">Checking...</p>
@@ -114,8 +123,8 @@ export default function AuthPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-[#7DFF51] flex flex-col items-center pt-12 px-4 pb-16 ${rubik.variable} ${yuseiMagic.variable}`}>
-      {/* Your SVG Logo */}
+    <div className={`min-h-screen bg-white flex flex-col items-center pt-12 px-4 pb-24 ${rubik.variable} ${yuseiMagic.variable} relative`}>
+      {/* Main Content */}
       <div className="mb-6">
         <Image
           src={LOGO_PATH}
@@ -123,20 +132,18 @@ export default function AuthPage() {
           width={80}
           height={80}
           priority
-          className="drop-shadow-none" // Explicitly disable shadow
+          className="drop-shadow-none"
         />
       </div>
 
-      {/* Title */}
       <h1 className={`text-black text-4xl md:text-5xl font-normal tracking-wide ${yuseiMagic.className}`}>
         Bento Games
-      </h1><br></br>
-      <div></div>
+      </h1>
+
       <h2 className={`text-black text-xl md:text-2xl mt-6 mb-8 ${yuseiMagic.className}`}>
         {isLogin ? 'Welcome Back!' : 'Create Your Profile'}
       </h2>
 
-      {/* Toggle */}
       <button
         type="button"
         onClick={() => {
@@ -160,7 +167,6 @@ export default function AuthPage() {
         )}
       </button>
 
-      {/* Form */}
       <div className="w-full max-w-md space-y-5">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -170,7 +176,7 @@ export default function AuthPage() {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3.5 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition"
+              className="w-full px-4 py-3.5 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition"
               required
             />
           </div>
@@ -182,7 +188,7 @@ export default function AuthPage() {
               type="date"
               value={dob}
               onChange={(e) => setDob(e.target.value)}
-              className="w-full px-4 py-3.5 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition"
+              className="w-full px-4 py-3.5 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition"
               required
             />
           </div>
@@ -227,7 +233,7 @@ export default function AuthPage() {
           )}
 
           {error && (
-            <div className="p-3.5 bg-red-100/80 text-red-700 rounded-xl text-sm text-center backdrop-blur-sm border border-red-200">
+            <div className="p-3.5 bg-red-100/80 text-red-700 rounded-xl text-sm text-center border border-red-200">
               {error}
             </div>
           )}
@@ -241,6 +247,25 @@ export default function AuthPage() {
           </button>
         </form>
       </div>
+
+      {/* Fixed Game Logo Ticker at Bottom */}
+{/* Fixed Game Logo Ticker at Bottom */}
+<div className="fixed bottom-0 left-0 right-0 h-[72px] bg-white/90 backdrop-blur-sm  flex items-center overflow-hidden z-10">
+  <div className="flex animate-scroll whitespace-nowrap px-4">
+    {[...gameLogos, ...gameLogos].map((logo, index) => (
+      <div key={index} className="mx-3 flex items-center justify-center h-full min-w-[56px]">
+        {/* Use plain <img> for reliable SVG rendering */}
+        <img
+          src={logo}
+          alt=""
+          aria-hidden="true"
+          className="h-[32px] w-auto max-w-[60px] object-contain"
+          loading="eager"
+        />
+      </div>
+    ))}
+  </div>
+</div>
     </div>
   );
 }
