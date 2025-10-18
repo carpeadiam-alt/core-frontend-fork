@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Rubik, Yusei_Magic } from 'next/font/google';
 
-
 const rubik = Rubik({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
@@ -36,15 +35,8 @@ const profileImages = [
   '/profiles/14.svg',
 ];
 
-// SVG illustration (from Shuffle page)
-const svgWidth = 1000;
-const svgHeight = 550;
-const svgScaleFactor = 0.75;
-const bottomOffset = -255; // Adjusted to avoid overlap
-const svgPath = '/fores/bg.svg';
 
-const scaledWidth = svgWidth * svgScaleFactor;
-const scaledHeight = svgHeight * svgScaleFactor;
+const LOGO_PATH = '/icons/new_logo.svg'; 
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -76,7 +68,7 @@ export default function AuthPage() {
         ? { username, dob }
         : { username, dob, photo_index: photoIndex };
 
-      
+      // Fixed URL (removed extra space)
       const response = await fetch(`https://thecodeworks.in/core_backend${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -110,8 +102,8 @@ export default function AuthPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F3FF48]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-black mx-auto"></div>
-          <p className="mt-3 text-black">Checking...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent mx-auto"></div>
+          <p className="mt-3 text-black font-medium">Checking...</p>
         </div>
       </div>
     );
@@ -122,120 +114,132 @@ export default function AuthPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-[#F3FF48] relative overflow-hidden ${rubik.variable} ${yuseiMagic.variable}`}>
-      {/* Foreground SVG Illustration */}
+    <div className={`min-h-screen bg-[#7DFF51] flex flex-col items-center pt-12 px-4 pb-16 ${rubik.variable} ${yuseiMagic.variable}`}>
+      {/* Your SVG Logo */}
+      <div className="mb-6">
+        <Image
+          src={LOGO_PATH}
+          alt="Bento Games Logo"
+          width={80}
+          height={80}
+          priority
+          className="drop-shadow-none" // Explicitly disable shadow
+        />
+      </div>
 
+      {/* Title */}
+      <h1 className={`text-black text-4xl md:text-5xl font-normal tracking-wide ${yuseiMagic.className}`}>
+        Bento Games
+      </h1><br></br>
+      <div></div>
+      <h2 className={`text-black text-xl md:text-2xl mt-6 mb-8 ${yuseiMagic.className}`}>
+        {isLogin ? 'Welcome Back!' : 'Create Your Profile'}
+      </h2>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center pt-12 px-6 pb-20">
-        <h1 className={`text-black text-5xl font-normal tracking-wide ${yuseiMagic.className}`}>
-          Bento Games
-        </h1>
+      {/* Toggle */}
+      <button
+        type="button"
+        onClick={() => {
+          setIsLogin(!isLogin);
+          setError('');
+          setUsername('');
+          setDob('');
+        }}
+        className={`mb-8 text-sm font-medium text-gray-700 transition-colors hover:text-pink-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 rounded px-2 py-1 ${rubik.className}`}
+      >
+        {isLogin ? (
+          <>
+            New here?{' '}
+            <span className="text-pink-600 font-semibold underline decoration-pink-300">Join Bento Games</span>
+          </>
+        ) : (
+          <>
+            Already have an account?{' '}
+            <span className="text-pink-600 font-semibold underline decoration-pink-300">Sign in</span>
+          </>
+        )}
+      </button>
 
-        <h2 className={`text-black text-2xl mt-6 mb-6 ${yuseiMagic.className}`}>
-          {isLogin ? 'Welcome Back!' : 'Create Your Profile'}
-        </h2>
+      {/* Form */}
+      <div className="w-full max-w-md space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <input
+              id="username"
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-3.5 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition"
+              required
+            />
+          </div>
 
-        {/* Simplified Toggle */}
-        <div className="text-center mb-6">
-          <p
-            className={`text-sm font-medium text-gray-700 cursor-pointer inline-flex items-center gap-1 transition-colors hover:text-pink-600 ${rubik.className}`}
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setError('');
-            }}
+          <div>
+            <label htmlFor="dob" className="sr-only">Date of Birth</label>
+            <input
+              id="dob"
+              type="date"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+              className="w-full px-4 py-3.5 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition"
+              required
+            />
+          </div>
+
+          {!isLogin && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3 text-center">
+                Choose your avatar
+              </label>
+              <div className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory py-2 gap-4 -mx-1 px-1">
+                {profileImages.map((imagePath, index) => (
+                  <div
+                    key={index}
+                    className={`relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 snap-start cursor-pointer transition-transform duration-150 ease-in-out ${
+                      photoIndex === index
+                        ? 'border-pink-500 scale-105'
+                        : 'border-transparent hover:border-gray-400'
+                    }`}
+                    onClick={() => setPhotoIndex(index)}
+                    role="radio"
+                    aria-checked={photoIndex === index}
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setPhotoIndex(index)}
+                  >
+                    <Image
+                      src={imagePath}
+                      alt={`Profile ${index + 1}`}
+                      fill
+                      className="object-contain p-1"
+                    />
+                    {photoIndex === index && (
+                      <div className="absolute inset-0 bg-pink-500 bg-opacity-15 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {error && (
+            <div className="p-3.5 bg-red-100/80 text-red-700 rounded-xl text-sm text-center backdrop-blur-sm border border-red-200">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-black text-white py-3.5 rounded-4xl font-medium transition-colors hover:bg-gray-900 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {isLogin ? (
-              <>
-                New here?{' '}
-                <span className="text-pink-600 font-semibold">Join Bento Games</span>
-              </>
-            ) : (
-              <>
-                Already have an account?{' '}
-                <span className="text-pink-600 font-semibold">Sign in</span>
-              </>
-            )}
-          </p>
-        </div>
-
-        {/* Form */}
-        <div className="w-full max-w-md space-y-5">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <input
-                id="username"
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400"
-                required
-              />
-            </div>
-
-            <div>
-              <input
-                id="dob"
-                type="date"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400"
-                required
-              />
-            </div>
-
-            {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
-                  Choose your avatar
-                </label>
-                <div className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory py-2 gap-3">
-                  {profileImages.map((imagePath, index) => (
-                    <div
-                      key={index}
-                      className={`relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 snap-center cursor-pointer transition-transform ${
-                        photoIndex === index
-                          ? 'border-pink-500 scale-110'
-                          : 'border-transparent hover:border-gray-300'
-                      }`}
-                      onClick={() => setPhotoIndex(index)}
-                    >
-                      <Image
-                        src={imagePath}
-                        alt={`Profile ${index + 1}`}
-                        fill
-                        className="object-contain p-1"
-                      />
-                      {photoIndex === index && (
-                        <div className="absolute inset-0 bg-pink-500 bg-opacity-20 flex items-center justify-center">
-                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            )}
-
-            {error && (
-              <div className="p-3 bg-red-100/80 text-red-700 rounded-lg text-sm text-center backdrop-blur-sm">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-black text-white py-3 rounded-full font-medium shadow hover:bg-gray-800 disabled:opacity-60 transition-colors"
-            >
-              {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
-            </button>
-          </form>
-        </div>
+            {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
+          </button>
+        </form>
       </div>
     </div>
   );
