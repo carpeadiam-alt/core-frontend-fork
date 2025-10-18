@@ -248,7 +248,7 @@ export default function AuthPage() {
       </div>
 
  
-      <div className="absolute bottom-0 left-0 right-0 h-[72px] bg-white/90 backdrop-blur-sm border-t border-gray-200 flex items-center overflow-hidden z-10">
+      <div className="absolute bottom-0 left-0 right-0 h-[72px] bg-white/90 backdrop-blur-sm  flex items-center overflow-hidden z-10">
         <div className="flex animate-scroll whitespace-nowrap px-4">
           {[...gameLogos, ...gameLogos].map((logo, index) => (
             <div key={index} className="mx-3 flex items-center justify-center h-full min-w-[56px]">
