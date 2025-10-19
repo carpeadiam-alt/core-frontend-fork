@@ -35,18 +35,6 @@ const profileImages = [
   '/profiles/14.svg',
 ];
 
-const gameLogos = [
-  '/icons/archives.svg',
-  '/icons/charades1.svg',
-  '/icons/cipher.svg',
-  '/icons/connections.svg',
-  '/icons/hopscotch.svg',
-  '/icons/miniesque.svg',
-  '/icons/punchline.svg',
-];
-
-const LOGO_PATH = '/icons/new_logo.svg';
-
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
@@ -57,10 +45,10 @@ export default function AuthPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const router = useRouter();
 
-  const svgWidth = 500; // Width of the SVG
-  const svgHeight = 300; // Height of the SVG
-  const bottomOffset = -100; // Height from bottom in pixels
-  const svgPath = "/fores/auth-fg.svg"; // Path to your SVG file
+  const svgWidth = 500;
+  const svgHeight = 300;
+  const bottomOffset = -100;
+  const svgPath = "/fores/auth-fg.svg";
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('bento_token') : null;
@@ -77,13 +65,16 @@ export default function AuthPage() {
     setError('');
 
     try {
+      // ✅ FIXED: Removed extra spaces in URL
+      const baseUrl = 'https://thecodeworks.in/core_backend'; // ← NO TRAILING SPACES!
       const endpoint = isLogin ? '/login' : '/register';
+      const url = `${baseUrl}${endpoint}`;
+
       const payload = isLogin
         ? { username, dob }
         : { username, dob, photo_index: photoIndex };
 
-      // ✅ Fixed URL: no extra spaces
-      const response = await fetch(`https://thecodeworks.in/core_backend${endpoint}`, {
+      const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -114,7 +105,7 @@ export default function AuthPage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#FFF900]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent mx-auto"></div>
           <p className="mt-3 text-black font-medium">Checking...</p>
@@ -128,44 +119,53 @@ export default function AuthPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-[#FFFC39] flex flex-col items-center pt-10 px-4 pb-28 relative ${rubik.variable} ${yuseiMagic.variable}`}>
-      {/* Logo */}
-
-      
-     
-
-      <h1 className={`text-black text-4xl md:text-5xl font-normal tracking-wide ${yuseiMagic.className}`}>
+    <div className={`min-h-screen bg-[#FFF900] flex flex-col items-center pt-8 px-4 pb-28 relative ${rubik.variable} ${yuseiMagic.variable}`}>
+      <h1 className={`text-black text-4xl md:text-5xl font-normal tracking-wide text-center ${yuseiMagic.className} mb-2`}>
         Bento Games
       </h1>
 
-      <h2 className={`text-black text-xl md:text-2xl mt-6 mb-8 ${yuseiMagic.className}`}>
-        {isLogin ? 'Welcome Back!' : 'Create Your Profile'}
-      </h2>
+<br></br>
 
-      <button
-        type="button"
-        onClick={() => {
-          setIsLogin(!isLogin);
-          setError('');
-          setUsername('');
-          setDob('');
-        }}
-        className={`mb-8 text-sm font-medium text-gray-700 transition-colors hover:text-pink-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 rounded px-2 py-1 ${rubik.className}`}
-      >
-        {isLogin ? (
-          <>
-            New here?{' '}
-            <span className="text-pink-600 font-semibold underline decoration-pink-300">Join Bento Games</span>
-          </>
-        ) : (
-          <>
-            Already have an account?{' '}
-            <span className="text-pink-600 font-semibold underline decoration-pink-300">Sign in</span>
-          </>
-        )}
-      </button>
+{/* Compact Black Pill Toggle */}
 
-      <div className="w-full max-w-md space-y-5">
+<div className="mb-6 flex justify-center">
+  <div className="flex rounded-full border p-1">
+    <button
+      type="button"
+      onClick={() => {
+        setIsLogin(true);
+        setError('');
+        setUsername('');
+        setDob('');
+      }}
+      className={`flex-1 py-2 px-4 text-sm font-small rounded-full transition-colors ${
+        isLogin
+          ? 'bg-black text-white'
+          : 'bg-transparent text-gray-700 hover:text-gray-900'
+      }`}
+    >
+      Sign In
+    </button>
+    <button
+      type="button"
+      onClick={() => {
+        setIsLogin(false);
+        setError('');
+        setUsername('');
+        setDob('');
+      }}
+      className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
+        !isLogin
+          ? 'bg-black text-white'
+          : 'bg-transparent text-gray-700 hover:text-gray-900'
+      }`}
+    >
+      Register 
+    </button>
+  </div>
+</div>
+
+      <div className="w-full max-w-sm space-y-5">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <input
@@ -174,21 +174,24 @@ export default function AuthPage() {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3.5 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition"
+              className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition text-base"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="dob" className="sr-only">Date of Birth</label>
+            <label htmlFor="dob" className="block text-xs text-gray-600 mb-1 text-left px-1">
+              Date of Birth
+            </label>
             <input
               id="dob"
               type="date"
               value={dob}
               onChange={(e) => setDob(e.target.value)}
-              className="w-full px-4 py-3.5 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition"
+              className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition text-base"
               required
             />
+            <p className="text-xs text-gray-500 mt-1 px-1">This will count as account passkey</p>
           </div>
 
           {!isLogin && (
@@ -196,11 +199,11 @@ export default function AuthPage() {
               <label className="block text-sm font-medium text-gray-700 mb-3 text-center">
                 Choose your avatar
               </label>
-              <div className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory py-2 gap-4 -mx-1 px-1">
+              <div className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory py-2 gap-3 -mx-1 px-1">
                 {profileImages.map((imagePath, index) => (
                   <div
                     key={index}
-                    className={`relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 snap-start cursor-pointer transition-transform duration-150 ease-in-out ${
+                    className={`relative flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 snap-start cursor-pointer transition-transform duration-150 ease-in-out ${
                       photoIndex === index
                         ? 'border-pink-500 scale-105'
                         : 'border-transparent hover:border-gray-400'
@@ -219,7 +222,7 @@ export default function AuthPage() {
                     />
                     {photoIndex === index && (
                       <div className="absolute inset-0 bg-pink-500 bg-opacity-15 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
@@ -231,7 +234,7 @@ export default function AuthPage() {
           )}
 
           {error && (
-            <div className="p-3.5 bg-red-100 text-red-700 rounded-xl text-sm text-center border border-red-200">
+            <div className="p-3 bg-red-100 text-red-700 rounded-xl text-sm text-center border border-red-200">
               {error}
             </div>
           )}
@@ -239,34 +242,31 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black text-white py-3.5 rounded-4xl font-medium transition-colors hover:bg-gray-900 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full bg-black text-white py-3 rounded-4xl font-medium text-base transition-colors hover:bg-gray-900 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
           </button>
         </form>
       </div>
 
-            {/* SVG Illustration - Fixed position with controllable size and bottom offset */}
-            <div 
-              className="fixed left-1/2 transform -translate-x-1/2 pointer-events-none"
-              style={{ 
-                bottom: `${bottomOffset}px`,
-                width: `${svgWidth}px`,
-                height: `${svgHeight}px`
-              }}
-            >
-              <Image
-                src={svgPath}
-                alt="Game illustration"
-                width={svgWidth}
-                height={svgHeight}
-                className="w-full h-full object-contain"
-                priority
-              />
-            </div>
-
- 
-
+      {/* SVG Illustration */}
+      <div 
+        className="fixed left-1/2 transform -translate-x-1/2 pointer-events-none"
+        style={{ 
+          bottom: `${bottomOffset}px`,
+          width: `${svgWidth}px`,
+          height: `${svgHeight}px`
+        }}
+      >
+        <Image
+          src={svgPath}
+          alt="Game illustration"
+          width={svgWidth}
+          height={svgHeight}
+          className="w-full h-full object-contain"
+          priority
+        />
+      </div>
     </div>
   );
 }
