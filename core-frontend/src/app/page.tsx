@@ -47,8 +47,8 @@ export default function AuthPage() {
 
   const svgWidth = 500;
   const svgHeight = 300;
-  const bottomOffset = -100;
-  const svgPath = "/fores/auth-fg.svg";
+  const bottomOffset = -100; // keeps it slightly below visible area
+  const svgPath = '/fores/auth-fg.svg';
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('bento_token') : null;
@@ -65,8 +65,8 @@ export default function AuthPage() {
     setError('');
 
     try {
-      // ✅ FIXED: Removed extra spaces in URL
-      const baseUrl = 'https://thecodeworks.in/core_backend'; // ← NO TRAILING SPACES!
+      // ⚠️ Fix: Remove trailing spaces in URL!
+      const baseUrl = 'https://thecodeworks.in/core_backend'; // ← NO SPACES!
       const endpoint = isLogin ? '/login' : '/register';
       const url = `${baseUrl}${endpoint}`;
 
@@ -105,7 +105,7 @@ export default function AuthPage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFF900]">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-[#FFF900]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent mx-auto"></div>
           <p className="mt-3 text-black font-medium">Checking...</p>
@@ -119,51 +119,51 @@ export default function AuthPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-[#FFF900] flex flex-col items-center pt-8 px-4 pb-28 relative ${rubik.variable} ${yuseiMagic.variable}`}>
+    <div className={`min-h-[100dvh] bg-[#FFF900] flex flex-col items-center pt-8 px-4 pb-28 relative ${rubik.variable} ${yuseiMagic.variable}`}>
       <h1 className={`text-black text-5xl md:text-6xl font-normal tracking-wide text-center ${yuseiMagic.className} mb-2`}>
         Bento Games
       </h1>
 
-<br></br>
-<br></br>
-{/* Compact Black Pill Toggle */}
+      <br />
+      <br />
 
-<div className="mb-6 flex justify-center">
-  <div className="flex rounded-full border p-1">
-    <button
-      type="button"
-      onClick={() => {
-        setIsLogin(true);
-        setError('');
-        setUsername('');
-        setDob('');
-      }}
-      className={`flex-1 py-2 px-4 text-sm font-small rounded-full transition-colors ${
-        isLogin
-          ? 'bg-black text-white'
-          : 'bg-transparent text-gray-700 hover:text-gray-900'
-      }`}
-    >
-      Sign In
-    </button>
-    <button
-      type="button"
-      onClick={() => {
-        setIsLogin(false);
-        setError('');
-        setUsername('');
-        setDob('');
-      }}
-      className={`flex-1 py-2 px-4 text-sm rounded-full transition-colors ${
-        !isLogin
-          ? 'bg-black text-white'
-          : 'bg-transparent text-gray-700 hover:text-gray-900'
-      }`}
-    >
-      Register 
-    </button>
-  </div>
-</div>
+      {/* ✅ Compact Toggle: Narrower, taller, no gray background */}
+      <div className="mb-6 flex justify-center">
+        <div className="flex rounded-full border border-gray-300 p-1">
+          <button
+            type="button"
+            onClick={() => {
+              setIsLogin(true);
+              setError('');
+              setUsername('');
+              setDob('');
+            }}
+            className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
+              isLogin
+                ? 'bg-black text-white'
+                : 'bg-transparent text-gray-700 hover:text-gray-900'
+            }`}
+          >
+            Sign In
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setIsLogin(false);
+              setError('');
+              setUsername('');
+              setDob('');
+            }}
+            className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
+              !isLogin
+                ? 'bg-black text-white'
+                : 'bg-transparent text-gray-700 hover:text-gray-900'
+            }`}
+          >
+            Register
+          </button>
+        </div>
+      </div>
 
       <div className="w-full max-w-sm space-y-5">
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -249,13 +249,13 @@ export default function AuthPage() {
         </form>
       </div>
 
-      {/* SVG Illustration */}
-      <div 
+      {/* ✅ FIXED SVG: stays at true bottom, doesn't jump on keyboard */}
+      <div
         className="fixed left-1/2 transform -translate-x-1/2 pointer-events-none"
-        style={{ 
+        style={{
           bottom: `${bottomOffset}px`,
           width: `${svgWidth}px`,
-          height: `${svgHeight}px`
+          height: `${svgHeight}px`,
         }}
       >
         <Image
