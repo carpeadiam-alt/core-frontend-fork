@@ -43,12 +43,13 @@ export default function AuthPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isInputFocused, setIsInputFocused] = useState(false); // 👈 NEW
   const router = useRouter();
 
   const svgWidth = 500;
   const svgHeight = 300;
-  const bottomOffset = -100; // keeps it slightly below visible area
-  const svgPath = '/fores/auth-fg.svg';
+  const bottomOffset = -100;
+  const svgPath = "/fores/auth-fg.svg";
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('bento_token') : null;
@@ -65,8 +66,7 @@ export default function AuthPage() {
     setError('');
 
     try {
-      // ⚠️ Fix: Remove trailing spaces in URL!
-      const baseUrl = 'https://thecodeworks.in/core_backend'; // ← NO SPACES!
+      const baseUrl = 'https://thecodeworks.in/core_backend'; // ✅ no spaces
       const endpoint = isLogin ? '/login' : '/register';
       const url = `${baseUrl}${endpoint}`;
 
@@ -97,6 +97,7 @@ export default function AuthPage() {
       console.error('Auth error:', err);
     } finally {
       setLoading(false);
+      // Optional: hide SVG after submit
     }
   };
 
@@ -127,7 +128,7 @@ export default function AuthPage() {
       <br />
       <br />
 
-      {/* ✅ Compact Toggle: Narrower, taller, no gray background */}
+      {/* Toggle */}
       <div className="mb-6 flex justify-center">
         <div className="flex rounded-full border border-gray-300 p-1">
           <button
@@ -174,6 +175,8 @@ export default function AuthPage() {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              onFocus={() => setIsInputFocused(true)}     // 👈
+              onBlur={() => setIsInputFocused(false)}      // 👈
               className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition text-base"
               required
             />
@@ -188,6 +191,8 @@ export default function AuthPage() {
               type="date"
               value={dob}
               onChange={(e) => setDob(e.target.value)}
+              onFocus={() => setIsInputFocused(true)}     // 👈
+              onBlur={() => setIsInputFocused(false)}      // 👈
               className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition text-base"
               required
             />
@@ -249,24 +254,26 @@ export default function AuthPage() {
         </form>
       </div>
 
-      {/* ✅ FIXED SVG: stays at true bottom, doesn't jump on keyboard */}
-      <div
-        className="fixed left-1/2 transform -translate-x-1/2 pointer-events-none"
-        style={{
-          bottom: `${bottomOffset}px`,
-          width: `${svgWidth}px`,
-          height: `${svgHeight}px`,
-        }}
-      >
-        <Image
-          src={svgPath}
-          alt="Game illustration"
-          width={svgWidth}
-          height={svgHeight}
-          className="w-full h-full object-contain"
-          priority
-        />
-      </div>
+      {/* ✅ SVG: HIDDEN when input is focused (keyboard likely open) */}
+      {!isInputFocused && (
+        <div
+          className="fixed left-1/2 transform -translate-x-1/2 pointer-events-none"
+          style={{
+            bottom: `${bottomOffset}px`,
+            width: `${svgWidth}px`,
+            height: `${svgHeight}px`,
+          }}
+        >
+          <Image
+            src={svgPath}
+            alt="Game illustration"
+            width={svgWidth}
+            height={svgHeight}
+            className="w-full h-full object-contain"
+            priority
+          />
+        </div>
+      )}
     </div>
   );
 }
