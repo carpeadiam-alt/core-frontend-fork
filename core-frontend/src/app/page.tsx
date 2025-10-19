@@ -120,12 +120,12 @@ export default function AuthPage() {
 
   return (
     <div className={`min-h-screen bg-[#FFF900] flex flex-col items-center pt-8 px-4 pb-28 relative ${rubik.variable} ${yuseiMagic.variable}`}>
-      <h1 className={`text-black text-4xl md:text-5xl font-normal tracking-wide text-center ${yuseiMagic.className} mb-2`}>
+      <h1 className={`text-black text-5xl md:text-6xl font-normal tracking-wide text-center ${yuseiMagic.className} mb-2`}>
         Bento Games
       </h1>
 
 <br></br>
-
+<br></br>
 {/* Compact Black Pill Toggle */}
 
 <div className="mb-6 flex justify-center">
@@ -154,7 +154,7 @@ export default function AuthPage() {
         setUsername('');
         setDob('');
       }}
-      className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
+      className={`flex-1 py-2 px-4 text-sm rounded-full transition-colors ${
         !isLogin
           ? 'bg-black text-white'
           : 'bg-transparent text-gray-700 hover:text-gray-900'
