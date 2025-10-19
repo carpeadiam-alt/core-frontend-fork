@@ -57,6 +57,11 @@ export default function AuthPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const router = useRouter();
 
+  const svgWidth = 500; // Width of the SVG
+  const svgHeight = 300; // Height of the SVG
+  const bottomOffset = -100; // Height from bottom in pixels
+  const svgPath = "/fores/auth-fg.svg"; // Path to your SVG file
+
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('bento_token') : null;
     const username = typeof window !== 'undefined' ? localStorage.getItem('bento_username') : null;
@@ -123,17 +128,11 @@ export default function AuthPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-white flex flex-col items-center pt-10 px-4 pb-28 relative ${rubik.variable} ${yuseiMagic.variable}`}>
+    <div className={`min-h-screen bg-[#FFFC39] flex flex-col items-center pt-10 px-4 pb-28 relative ${rubik.variable} ${yuseiMagic.variable}`}>
       {/* Logo */}
-      <div className="mb-6">
-        <Image
-          src={LOGO_PATH}
-          alt="Bento Games Logo"
-          width={80}
-          height={80}
-          priority
-        />
-      </div>
+
+      
+     
 
       <h1 className={`text-black text-4xl md:text-5xl font-normal tracking-wide ${yuseiMagic.className}`}>
         Bento Games
@@ -247,22 +246,27 @@ export default function AuthPage() {
         </form>
       </div>
 
- 
-      <div className="absolute bottom-0 left-0 right-0 h-[72px] bg-white/90 backdrop-blur-sm  flex items-center overflow-hidden z-10">
-        <div className="flex animate-scroll whitespace-nowrap px-4">
-          {[...gameLogos, ...gameLogos].map((logo, index) => (
-            <div key={index} className="mx-3 flex items-center justify-center h-full min-w-[56px]">
-              <img
-                src={logo}
-                alt=""
-                aria-hidden="true"
-                className="h-[32px] w-auto max-w-[60px] object-contain"
-                loading="eager"
+            {/* SVG Illustration - Fixed position with controllable size and bottom offset */}
+            <div 
+              className="fixed left-1/2 transform -translate-x-1/2 pointer-events-none"
+              style={{ 
+                bottom: `${bottomOffset}px`,
+                width: `${svgWidth}px`,
+                height: `${svgHeight}px`
+              }}
+            >
+              <Image
+                src={svgPath}
+                alt="Game illustration"
+                width={svgWidth}
+                height={svgHeight}
+                className="w-full h-full object-contain"
+                priority
               />
             </div>
-          ))}
-        </div>
-      </div>
+
+ 
+
     </div>
   );
 }

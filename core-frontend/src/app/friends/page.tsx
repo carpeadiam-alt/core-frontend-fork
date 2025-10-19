@@ -22,15 +22,14 @@ export default function AddFriendPage() {
   const [userToken, setUserToken] = useState('');
   const [username, setUsername] = useState<string | null>(null);
   const [photoIndex, setPhotoIndex] = useState<number>(0);
-  const [shareUrl, setShareUrl] = useState('');
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | null }>({
     text: '',
     type: null,
   });
 
-  // Sidebar state
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle'); // ✅ for button feedback
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -47,7 +46,6 @@ export default function AddFriendPage() {
     setUserToken(token);
     setUsername(user);
     
-    // Fetch profile
     fetch(`https://thecodeworks.in/core_backend/profile?token=${encodeURIComponent(token)}`)
       .then((res) => res.json())
       .then((data) => {
@@ -56,20 +54,13 @@ export default function AddFriendPage() {
         }
       })
       .catch(console.error);
-    
-    // Generate share URL
-    const currentUrl = window.location.origin;
-    setShareUrl(`${currentUrl}/add-friend?myToken=${token}`);
   }, [router]);
 
   const handleAddFriend = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!friendToken.trim()) {
-      setMessage({
-        text: 'Please enter a friend token',
-        type: 'error',
-      });
+      setMessage({ text: 'Please enter a friend token', type: 'error' });
       setTimeout(() => setMessage({ text: '', type: null }), 3000);
       return;
     }
@@ -80,9 +71,7 @@ export default function AddFriendPage() {
     try {
       const response = await fetch('https://thecodeworks.in/core_backend/add_friend', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           token: userToken,
           friend_token: friendToken.trim(),
@@ -91,14 +80,9 @@ export default function AddFriendPage() {
       
       const data = await response.json();
       
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to add friend');
-      }
+      if (!response.ok) throw new Error(data.error || 'Failed to add friend');
       
-      setMessage({
-        text: `Friend ${data.friend_username} added successfully!`,
-        type: 'success',
-      });
+      setMessage({ text: `Friend ${data.friend_username} added successfully!`, type: 'success' });
       setFriendToken('');
       setTimeout(() => setMessage({ text: '', type: null }), 3000);
     } catch (error) {
@@ -114,21 +98,9 @@ export default function AddFriendPage() {
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(shareUrl)
-      .then(() => {
-        setMessage({
-          text: 'Link copied to clipboard!',
-          type: 'success',
-        });
-        setTimeout(() => setMessage({ text: '', type: null }), 3000);
-      })
-      .catch(() => {
-        setMessage({
-          text: 'Failed to copy link',
-          type: 'error',
-        });
-        setTimeout(() => setMessage({ text: '', type: null }), 3000);
-      });
+    navigator.clipboard.writeText(userToken);
+    setCopyStatus('copied');
+    setTimeout(() => setCopyStatus('idle'), 2000);
   };
 
   const handleLogout = () => {
@@ -179,7 +151,7 @@ export default function AddFriendPage() {
             </svg>
           </button>
         </div>
-        <nav className="p-4 space-y-3 border-t border-gray-200">
+        <nav className="p-4 space-y-3 ">
           <Link
             href="/home"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
@@ -231,7 +203,7 @@ export default function AddFriendPage() {
           <div className="max-w-md mx-auto px-4 pb-8">
             {message.text && (
               <div 
-                className={`mb-4 p-3 text-center rounded-lg text-white transition-opacity duration-300 ${
+                className={`mb-4 p-3 text-center ${rubik.variable} font-sans rounded-lg text-white transition-opacity duration-300 ${
                   message.type === 'success' 
                     ? 'bg-green-500' 
                     : message.type === 'error' 
@@ -243,30 +215,33 @@ export default function AddFriendPage() {
               </div>
             )}
 
-            <div className="bg-white p-6 rounded-lg border border-gray-300">
+
+            <div className="bg-white p-6 rounded-lg ">
               <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center" style={yuseiMagic}>
                 Add Friends
               </h1>
-              
+              <br></br>
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-700 mb-3">Your Friend Code</h2>
+                <h2 className="text-lg ${rubik.variable} font-sans font-semibold text-gray-700 mb-3">Your Friend Code</h2>
                 <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between border border-gray-200">
                   <span className="font-mono text-sm break-all">{userToken}</span>
+                  
+
                   <button
                     onClick={copyToClipboard}
-                    className="ml-2 px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
+                    className="px-3 py-1.5 bg-white text-gray-800 ${rubik.variable} font-sans text-sm rounded-full border border-gray-300 hover:bg-gray-200 transition-colors"
                   >
-                    Copy
+                    {copyStatus === 'copied' ? 'Copied!' : 'Copy'}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 mt-2 ${rubik.variable} font-sans">
                   Share this code with friends so they can add you
                 </p>
               </div>
-
+              <br></br><br></br>
               <form onSubmit={handleAddFriend} className="space-y-4">
                 <div>
-                  <label htmlFor="friendToken" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="friendToken" className="block text-sm font-medium text-gray-700 mb-2 ${rubik.variable} font-sans">
                     Enter Friend's Code
                   </label>
                   <input
@@ -279,24 +254,15 @@ export default function AddFriendPage() {
                     disabled={isLoading}
                   />
                 </div>
-                
+                <br></br>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full bg-black text-white py-3 rounded-full  hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {isLoading ? 'Adding Friend...' : 'Add Friend'}
+                  {isLoading ? 'Adding Friend...' : '+ Add Friend'}
                 </button>
               </form>
-            </div>
-            
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => router.push('/leaderboard')}
-                className="text-blue-600 hover:text-blue-800 font-medium"
-              >
-                View Leaderboard →
-              </button>
             </div>
           </div>
         </div>

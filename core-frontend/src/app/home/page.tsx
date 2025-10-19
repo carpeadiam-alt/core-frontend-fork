@@ -405,14 +405,14 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="max-w-md mx-auto px-4 pb-8">
+          <div className="max-w-md mx-auto px-4 pb-8 ">
 <div className="mb-8">
   {/* Centered icon */}
   <div className="flex justify-center mb-4">
     <img
       src={isEvening ? '/icons/night.svg' : '/icons/day.svg'}
       alt={`${greeting} icon`}
-      className="w-32 h-32 object-contain"
+      className="w-42 h-42 object-contain"
     />
   </div>
 

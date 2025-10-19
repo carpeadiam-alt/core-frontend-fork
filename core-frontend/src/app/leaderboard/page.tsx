@@ -273,7 +273,7 @@ export default function LeaderboardPage() {
             </svg>
           </button>
         </div>
-        <nav className="p-4 space-y-3 border-t border-gray-200">
+        <nav className="p-4 space-y-3 ">
           <Link
             href="/home"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
@@ -372,16 +372,16 @@ export default function LeaderboardPage() {
             {/* Game Selector */}
             {games.length > 0 && (
               <div className="mb-6 flex items-center justify-between bg-white rounded-lg p-3 border border-gray-300">
-                <button
-                  onClick={prevGame}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                  disabled={games.length <= 1}
-                  aria-label="Previous game"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </button>
+            <button
+              onClick={prevGame}
+              className="p-2 hover:bg-gray-100 rounded-full border border-gray-300 transition-colors"
+              disabled={games.length <= 1}
+              aria-label="Previous game"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </button>
 
                 <div className="flex items-center space-x-2">
                   <img
@@ -399,7 +399,7 @@ export default function LeaderboardPage() {
 
                 <button
                   onClick={nextGame}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-gray-100 rounded-full border border-gray-300 transition-colors"
                   disabled={games.length <= 1}
                   aria-label="Next game"
                 >
@@ -448,14 +448,17 @@ export default function LeaderboardPage() {
               )}
             </div>
 
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => router.push('/friends')}
-                className="text-black-600 hover:text-black-800 font-medium"
-              >
-                ← Add Friends
-              </button>
-            </div>
+<div className="mt-6 flex justify-center">
+  <button
+    onClick={() => router.push('/friends')}
+    className="flex items-center gap-1.25 bg-black text-white py-2 px-4 rounded-full hover:bg-gray-800 transition-colors"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+    </svg>
+    Add Friends
+  </button>
+</div>
           </div>
         </div>
       </div>
