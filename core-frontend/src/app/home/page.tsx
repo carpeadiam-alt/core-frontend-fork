@@ -212,7 +212,7 @@ export default function Home() {
       subtitle: 'The Connections Pt II',
       icon: '/icons/sd.svg',
       color: 'bg-[#69FFE8]',
-      href: '/sixdegrees',
+      href: '/sixdegrees-fg',
       logoSize: 60,
     },
     {
