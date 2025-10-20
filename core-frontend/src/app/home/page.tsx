@@ -215,7 +215,7 @@ export default function Home() {
       href: '/sixdegrees-fg',
       logoSize: 60,
     },
-    {
+    {        
       id: 'wikisprint',
       title: 'Wikisprint',
       subtitle: 'Link Travel',
