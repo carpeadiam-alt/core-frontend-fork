@@ -239,7 +239,7 @@ export default function Home() {
       subtitle: 'Numbers game',
       icon: '/icons/hopscotch.svg',
       color: 'bg-[#B5DCFF]',
-      href: getGameUrl('https://thecodeworks.in/coreTries/hopscotch.html      '),
+      href: '/hopscotch-fg',
       logoSize: 50,
     },
     {

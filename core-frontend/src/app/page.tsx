@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Rubik, Yusei_Magic } from 'next/font/google';
+import { Molle } from 'next/font/google'; // 👈 NEW: Import Molle
 
 const rubik = Rubik({
   subsets: ['latin'],
@@ -15,6 +16,13 @@ const yuseiMagic = Yusei_Magic({
   subsets: ['latin'],
   weight: '400',
   variable: '--font-yusei-magic',
+});
+
+const molle = Molle({ // 👈 NEW: Configure Molle (italic by default, only weight 400)
+  subsets: ['latin'],
+  weight: '400',
+  style: 'italic',
+  variable: '--font-molle',
 });
 
 const profileImages = [
@@ -43,7 +51,7 @@ export default function AuthPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [isInputFocused, setIsInputFocused] = useState(false); // 👈 NEW
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const router = useRouter();
 
   const svgWidth = 500;
@@ -97,7 +105,6 @@ export default function AuthPage() {
       console.error('Auth error:', err);
     } finally {
       setLoading(false);
-      // Optional: hide SVG after submit
     }
   };
 
@@ -120,8 +127,18 @@ export default function AuthPage() {
   }
 
   return (
-    <div className={`min-h-[100dvh] bg-[#FFF900] flex flex-col items-center pt-8 px-4 pb-28 relative ${rubik.variable} ${yuseiMagic.variable}`}>
-      <h1 className={`text-black text-5xl md:text-6xl font-normal tracking-wide text-center ${yuseiMagic.className} mb-2`}>
+    <div className={`min-h-[100dvh] bg-[#FFF900] flex flex-col items-center pt-8 px-4 pb-28 relative ${rubik.variable} ${yuseiMagic.variable} ${molle.variable}`}>
+
+<p className="text-black text-center flex items-center justify-center gap-2">
+  <span className={`text-3xl md:text-4xl ${molle.className}`}>
+    tcw
+  </span>
+  <span className={`text-sm md:text-base ${rubik.className}`}>
+    presents
+  </span>
+</p>
+
+      <h1 className={`text-black text-4xl md:text-5xl font-normal tracking-wide text-center ${yuseiMagic.className} mb-2`}>
         Bento Games
       </h1>
 
@@ -175,8 +192,8 @@ export default function AuthPage() {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              onFocus={() => setIsInputFocused(true)}     // 👈
-              onBlur={() => setIsInputFocused(false)}      // 👈
+              onFocus={() => setIsInputFocused(true)}
+              onBlur={() => setIsInputFocused(false)}
               className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition text-base"
               required
             />
@@ -191,8 +208,8 @@ export default function AuthPage() {
               type="date"
               value={dob}
               onChange={(e) => setDob(e.target.value)}
-              onFocus={() => setIsInputFocused(true)}     // 👈
-              onBlur={() => setIsInputFocused(false)}      // 👈
+              onFocus={() => setIsInputFocused(true)}
+              onBlur={() => setIsInputFocused(false)}
               className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition text-base"
               required
             />
@@ -254,7 +271,6 @@ export default function AuthPage() {
         </form>
       </div>
 
-      {/* ✅ SVG: HIDDEN when input is focused (keyboard likely open) */}
       {!isInputFocused && (
         <div
           className="fixed left-1/2 transform -translate-x-1/2 pointer-events-none"
