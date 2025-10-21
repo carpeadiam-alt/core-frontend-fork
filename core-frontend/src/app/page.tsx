@@ -132,7 +132,7 @@ export default function AuthPage() {
 <p className="text-black text-center flex items-center justify-center gap-2">
   <span className={`text-3xl md:text-4xl ${molle.className}`}>
     tcw
-  </span>
+  </span>    
   <span className={`text-sm md:text-base ${rubik.className}`}>
     presents
   </span>
