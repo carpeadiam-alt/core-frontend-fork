@@ -13,15 +13,15 @@ const rubik = Rubik({
 const yuseiMagic = Yusei_Magic({
   subsets: ['latin'],
   weight: '400', // Yusei Magic only has one weight
-  variable: '--font-yusei-magic',
+  variable: '--font-yusei-magic',    
 });
 
 // Controllable parameters for logo SVG
 const logoSize = 64; // Size of the logo
-const logoPath = "/icons/shuffle-w.svg"; // Path to your logo SVG file
+const logoPath = "/icons/shuffle-w.svg"; // Path to your logo SVG file 
 
 // Controllable parameters for button link
-const buttonHref = "https://thecodeworks.in/coreTries/shuffle.html"; // Change this to your desired link (internal: "/page" or external: "https://example.com")
+const buttonHref = "https://thecodeworks.in/coreTries/shuffle2.html"; // Change this to your desired link (internal: "/page" or external: "https://example.com")
 const buttonText = "Play"; // Button text
 
 export default function Page() {
