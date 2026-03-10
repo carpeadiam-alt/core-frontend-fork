@@ -13,7 +13,7 @@ const rubik = Rubik({
 const yuseiMagic = Yusei_Magic({
   subsets: ['latin'],
   weight: '400', // Yusei Magic only has one weight
-  variable: '--font-yusei-magic',    
+  variable: '--font-yusei-magic',     
 });
 
 // Controllable parameters for logo SVG
